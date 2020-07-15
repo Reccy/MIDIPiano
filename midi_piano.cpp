@@ -1,5 +1,7 @@
 #include <iostream>
+#include "midi_piano.h"
 
-int main() {
-	std::cout << "Hello, world!" << std::endl;
-}
+int MidiPiano::test()
+{
+	return 1;
+};
