@@ -8,5 +8,5 @@ file(GLOB LIBRARY_SOURCES "src/core/*.cpp")
 
 add_library(MidiPianoCore ${LIBRARY_SOURCES})
 
-add_executable(MidiPiano "src/main/main.cpp")
+add_executable(MidiPiano "src/main.cpp")
 target_link_libraries(MidiPiano MidiPianoCore)
