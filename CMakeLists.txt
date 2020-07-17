@@ -1,12 +1,31 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.1.0)
 
-project(MidiPiano VERSION 0.0.1)
+project(MidiPiano LANGUAGES CXX)
 
-include_directories("inc/core")
+set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB LIBRARY_SOURCES "src/core/*.cpp")
+# Library Setup
+set(LIBRARY_DIR "core")
+set(LIBRARY_NAME "MidiPianoCore")
 
-add_library(MidiPianoCore ${LIBRARY_SOURCES})
+set(LIBRARY_HEADERS
+	"${LIBRARY_DIR}/midi_piano.h"
+)
 
-add_executable(MidiPiano "src/main.cpp")
-target_link_libraries(MidiPiano MidiPianoCore)
+set(LIBRARY_SOURCES
+	"${LIBRARY_DIR}/midi_piano.cpp"
+)
+
+add_library("${LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
+
+# Executable Setup
+set(EXECUTABLE_DIR "main")
+set(EXECUTABLE_NAME "${PROJECT_NAME}")
+
+set(EXECUTABLE_SOURCES
+	"${EXECUTABLE_DIR}/main.cpp"
+)
+
+add_executable("${EXECUTABLE_NAME}" "${EXECUTABLE_SOURCES}")
+target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
+target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}")
