@@ -3,14 +3,14 @@ language: cpp
 compiler: clang
 
 branches:
-	only:
-		- master
-		- travis-test
+  only:
+    - master
+    - travis-test
 
 before_script:
-	- mkdir build
-	- cd build
-	- cmake ..
+  - mkdir build
+  - cd build
+  - cmake ..
 
 script:
-	- cmake
+  - cmake
