@@ -1,0 +1,7 @@
+compiler: clang
+
+# safelist
+branches:
+  only:
+  - master
+  - travis-test
