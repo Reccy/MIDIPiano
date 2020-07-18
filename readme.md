@@ -11,6 +11,8 @@
 ***REMOVED***
 ***REMOVED***
 ***REMOVED***
+***REMOVED***
+***REMOVED***
 
 ***REMOVED***
 ***REMOVED***
@@ -19,4 +21,6 @@
 ***REMOVED***
 ***REMOVED******REMOVED******REMOVED***
 
-This project targets ISO C++ 17, and was built using Visual Studio 2019.
+***REMOVED***
+***REMOVED***
+***REMOVED***
