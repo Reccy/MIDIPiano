@@ -13,6 +13,7 @@ before_install:
 - cmake --build .
 - cd Debug
 script:
+- dir
 - MidiPianoTestRunner.exe
 deploy:
   provider: releases
