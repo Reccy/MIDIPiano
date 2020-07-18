@@ -2,10 +2,6 @@ os: windows
 language: cpp
 compiler:
   - clang
-branches:
-  only:
-    - master
-    - travis-test
 before_install:
   - mkdir build
   - cd build
@@ -23,5 +19,7 @@ deploy:
   cleanup: false
   on:
     repo: Reccy/MIDIPiano
-    branch: travis-test
+    branch:
+    - master
+    - travis-test
     tags: true
