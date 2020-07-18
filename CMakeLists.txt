@@ -33,7 +33,7 @@ set(TEST_SUITE_DIR "test")
 set(TEST_RUNNER_EXECUTABLE_NAME "MidiPianoTestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
- "test/core/midi_piano_test.cpp")
+	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
 target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${LIBRARY_NAME}")

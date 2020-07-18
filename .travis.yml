@@ -22,4 +22,5 @@ deploy:
   on:
     repo: Reccy/MIDIPiano
     branch: travis-test
+    tag: true
   skip_cleanup: 'true'
