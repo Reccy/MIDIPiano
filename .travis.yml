@@ -7,10 +7,14 @@ branches:
     - master
     - travis-test
 
-before_script:
+before_install:
   - mkdir build
   - cd build
   - cmake ..
 
+install:
+  - make
+  - chmod +x MidiPianoTestRunner
+
 script:
-  - cmake
+  - ./MidiPianoTestRunner
