@@ -14,7 +14,7 @@ before_install:
   - cd Debug
 script:
   - dir
-  - "MidiPianoTestRunner.exe"
+  - "./MidiPianoTestRunner.exe"
 deploy:
   provider: releases
   api_key:
