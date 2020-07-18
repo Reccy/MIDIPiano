@@ -1,31 +1,25 @@
 language: cpp
-
 compiler:
-  - clang
-
+- clang
 branches:
   only:
-    - master
-    - travis-test
-
+  - master
+  - travis-test
 before_install:
-  - mkdir build
-  - cd build
-  - cmake ..
-
+- mkdir build
+- cd build
+- cmake ..
 install:
-  - make
-  - chmod +x MidiPianoTestRunner
-
+- make
+- chmod +x MidiPianoTestRunner
 script:
-  - ./MidiPianoTestRunner
-
+- "./MidiPianoTestRunner"
 deploy:
   provider: releases
-  api_key: $GITHUB_OAUTH_TOKEN
-  file: ./MidiPiano.exe
-  cleanup: false
+  api_key:
+    secure: SZHLQIlWNMzGH3PBvevwE8myB40njBzv1OtKojI6fq7ksn4+HsyTqtU+CMzT4a8LRtGAeSQieBVziRzY5q+J0YU94sWyXJLXLmUERN5yJ/B7n6C105OInXZU8tzzm0UNYsoa7auWJgz/ePp1fudDUUvBdTV2GAPkdPN/lkbXKbe02B2hNvphjPw3pvZjrga8Le7Mm49apESIl4B6GGSCgdnFUEOTs/QB9O9SU/j5j0eLD12d4gKdPZaMmrvmqTX+bTi5mGIhl0w+2bPzaVhuG9tx8L8OwhH8I7oY4XvwSuAFuE5uzy3Cjtsooz6w2/Xc0FdRetGerR78/HpIEEPTvxgsF25fnV/Yo0prT0rnl2m3yCFCkRVN+DOs7HoBAGL1fSR2XRBMeNJsLXyjm3Hl7sykGNC8aQEeNSEq6K/WqE8E/WeHpXaPnCeQb3EiQ7L1tAN3Qh7xrud9zEdnZoTRFLn1kR2E0DNBh0qVK6+BxmyJxreRQ02DafKVwAuJrCVGL3G/wn+Fm5BPesbiujXL8qp+sOLqUWGSRTGppE/KmqwZEpGA6WW8Ojj/ugdeE/pQ/tyqro4EOS9IVQM+gsBQ0FjKEExhqqTB6lNvn1nvR5CAdR70mMWxRsoEDwXUlwSQnaYP6jTWE59JaGJrc2al/zGERJUdMdVHl/djF2Akjmk=
+  file: MidiPiano.exe
   on:
-    branch:
-      - master
-      - travis-test
+    repo: Reccy/MIDIPiano
+    branch: travis-test
+  skip_cleanup: 'true'
