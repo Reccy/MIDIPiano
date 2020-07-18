@@ -10,7 +10,7 @@ before_install:
 - mkdir build
 - cd build
 - cmake ..
-- cmake --build ..
+- cmake --build .
 - cd Debug
 script:
 - MidiPianoTestRunner.exe
