@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/Reccy/MIDIPiano.svg?token=3dTnamUTKvjxLtGdMa3S&branch=master)](https://travis-ci.com/Reccy/MIDIPiano)
+
 MIDI Piano
 ==========
 
