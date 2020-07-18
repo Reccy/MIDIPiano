@@ -26,4 +26,6 @@ deploy:
   file: ./MidiPiano.exe
   cleanup: false
   on:
-    tags: true
+    branch:
+      - master
+      - travis-test
