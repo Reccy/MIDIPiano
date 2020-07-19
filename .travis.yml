@@ -21,5 +21,4 @@ deploy:
     repo: Reccy/MIDIPiano
     branch:
     - master
-    - travis-test
     tags: true
