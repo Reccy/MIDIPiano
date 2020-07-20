@@ -1,6 +1,5 @@
 MIDI Piano
 ==========
-[![Build Status](https://travis-ci.com/Reccy/MIDIPiano.svg?token=3dTnamUTKvjxLtGdMa3S&branch=master)](https://travis-ci.com/Reccy/MIDIPiano)
 
 A C++ Project by Aaron Meaney
 
@@ -24,4 +23,3 @@ Project Configuration
 
 This project targets ISO C++ 11 and is compatible with gcc and clang.
 CMake 3.1.0 or later is required to generate a build system.
-This project uses TravisCI as its CI platform.
