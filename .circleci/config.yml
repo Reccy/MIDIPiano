@@ -3,16 +3,9 @@ version: 2.1
 orbs:
     win: circleci/windows@2.3.0
 
-executors:
-    windows-executor:
-        windows:
-            name: win/default
-            size: "medium"
-        working_directory: /tmp
-
 jobs:
     build:
-        executor: windows-executor
+        executor: win/default
         steps:
             - run:
                 name: Listing working directory
@@ -33,14 +26,14 @@ jobs:
                 name: Building project in Release configuration
                 command: cmake --build . --config Release
             - persist_to_workspace:
-                root: /tmp/build
+                root: build
                 paths:
                     - Release
     test:
-        executor: windows-executor
+        executor: win/default
         steps:
             - attach_workspace:
-                at: /tmp/build
+                at: build
             - run:
                 name: Listing working directory
                 command: pwd
@@ -49,7 +42,7 @@ jobs:
                 command: ls -al
             - run:
                 name: Executing Test Runner
-                command: /tmp/build/Release/MidiPianoTestRunner.exe
+                command: ./Release/MidiPianoTestRunner.exe
 
 workflows:
     version: 2.1
