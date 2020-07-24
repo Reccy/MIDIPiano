@@ -24,14 +24,13 @@ jobs:
                 name: Creating build directory
                 command: mkdir build
             - run:
-                name: Changing directory to build
-                command: cd build
-            - run:
                 name: Generating build system with CMake
                 command: cmake ..
+                working_directory: build
             - run:
                 name: Building project in Release configuration
                 command: cmake --build . --config Release
+                working_directory: build
             - persist_to_workspace:
                 root: build
                 paths:
