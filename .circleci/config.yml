@@ -5,8 +5,9 @@ orbs:
 
 executors:
     windows-executor:
-        name: win/default
-        size: "medium"
+        windows:
+            name: win/default
+            size: "medium"
         working_directory: /tmp
 
 jobs:
