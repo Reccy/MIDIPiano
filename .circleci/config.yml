@@ -10,7 +10,10 @@ jobs:
             - checkout
             - run:
                 name: Installing CMake using Chocolatey
-                command: choco install cmake -y
+                command: choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
+            - run:
+                name: Refreshing Powershell
+                command: refreshenv
             - run:
                 name: Listing working directory
                 command: pwd
