@@ -48,7 +48,8 @@ jobs:
                 command: dir
             - run:
                 name: Executing Test Runner
-                command: ./Release/MidiPianoTestRunner.exe
+                command: ./MidiPianoTestRunner.exe
+                working_directory: build/Release
 
 workflows:
     version: 2.1
