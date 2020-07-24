@@ -7,6 +7,10 @@ jobs:
     build:
         executor: win/default
         steps:
+            - checkout
+            - run:
+                name: Installing CMake using Chocolatey
+                command: choco install cmake -y
             - run:
                 name: Listing working directory
                 command: pwd
