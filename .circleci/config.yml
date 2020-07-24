@@ -15,12 +15,6 @@ jobs:
                 name: Refreshing Powershell
                 command: refreshenv
             - run:
-                name: Listing working directory
-                command: pwd
-            - run:
-                name: Listing current directory
-                command: dir
-            - run:
                 name: Creating build directory
                 command: mkdir build
             - run:
@@ -40,12 +34,6 @@ jobs:
         steps:
             - attach_workspace:
                 at: build
-            - run:
-                name: Listing working directory
-                command: pwd
-            - run:
-                name: Listing current directory
-                command: dir
             - run:
                 name: Executing Test Runner
                 command: ./MidiPianoTestRunner.exe
