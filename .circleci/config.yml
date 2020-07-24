@@ -12,7 +12,7 @@ jobs:
                 command: pwd
             - run:
                 name: Listing current directory
-                command: ls -al
+                command: dir
             - run:
                 name: Creating build directory
                 command: mkdir build
@@ -39,7 +39,7 @@ jobs:
                 command: pwd
             - run:
                 name: Listing current directory
-                command: ls -al
+                command: dir
             - run:
                 name: Executing Test Runner
                 command: ./Release/MidiPianoTestRunner.exe
