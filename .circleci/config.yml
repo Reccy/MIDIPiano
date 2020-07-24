@@ -3,16 +3,58 @@ version: 2.1
 orbs:
     win: circleci/windows@2.3.0
 
+executors:
+    windows-executor:
+        name: win/default
+        size: "medium"
+        working_directory: /tmp
+
 jobs:
     build:
-        executor:
-            name: win/default
-            size: "medium"
+        executor: windows-executor
         steps:
-            - run: Write-Host "Hello Windows"
+            - run:
+                name: Listing working directory
+                command: pwd
+            - run:
+                name: Listing current directory
+                command: ls -al
+            - run:
+                name: Creating build directory
+                command: mkdir build
+            - run:
+                name: Changing directory to build
+                command: cd build
+            - run:
+                name: Generating build system with CMake
+                command: cmake ..
+            - run:
+                name: Building project in Release configuration
+                command: cmake --build . --config Release
+            - persist_to_workspace:
+                root: /tmp/build
+                paths:
+                    - Release
+    test:
+        executor: windows-executor
+        steps:
+            - attach_workspace:
+                at: /tmp/build
+            - run:
+                name: Listing working directory
+                command: pwd
+            - run:
+                name: Listing current directory
+                command: ls -al
+            - run:
+                name: Executing Test Runner
+                command: /tmp/build/Release/MidiPianoTestRunner.exe
 
 workflows:
     version: 2.1
-    dist-compile:
+    build_and-test:
         jobs:
             - build
+            - test:
+                requires:
+                    - build
