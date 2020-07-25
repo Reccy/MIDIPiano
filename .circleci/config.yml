@@ -50,12 +50,15 @@ jobs:
                 command: chmod +x ./generate_release_tag.sh
                 working_directory: .circleci
             - run:
-                name: Generate Release Tag for GitHub
-                command: VERSION=$(./generate_release_tag.sh)
-                working_directory: .circleci
-            - run:
                 name: Publish Release on GitHub
-                command: ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./build/Release
+                command: |
+                    VERSION=$(.circleci/generate_release_tag.sh)
+                    ghr -t "${GITHUB_TOKEN}" \
+                    -u "${CIRCLE_PROJECT_USERNAME}" \
+                    -r "${CIRCLE_PROJECT_REPONAME}" \
+                    -c "${CIRCLE_SHA1}" \
+                    -delete "${VERSION}" \
+                    ./build/Release
 
 workflows:
     version: 2.1
