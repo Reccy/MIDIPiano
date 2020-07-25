@@ -4,8 +4,7 @@ set -e
 
 # Gets the current branch name on Git
 function branch_name {
-	#echo $(git rev-parse --abbrev-ref HEAD)
-	echo "release/1.8"
+	echo $(git rev-parse --abbrev-ref HEAD)
 }
 
 # REGEX pattern for branch
