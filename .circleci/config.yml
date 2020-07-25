@@ -46,6 +46,10 @@ jobs:
             - attach_workspace:
                 at: build
             - run:
+                name: Add execute flag to generate_release_tag.sh
+                command: chmod +x ./generate_release_tag.sh
+                working_directory: .circleci
+            - run:
                 name: Generate Release Tag for GitHub
                 command: VERSION=$(./generate_release_tag.sh)
                 working_directory: .circleci
