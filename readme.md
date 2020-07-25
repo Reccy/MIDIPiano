@@ -1,27 +1,25 @@
-***REMOVED***
-***REMOVED***
-***REMOVED***
+# MIDIPiano
+[![Reccy](https://circleci.com/gh/Reccy/MIDIPiano.svg?style=shield)](https://app.circleci.com/pipelines/github/Reccy/MIDIPiano)
 
-***REMOVED***
+Play and visualise music on the desktop.
 
-***REMOVED***
-***REMOVED***
+## Description
+The purpose of this project is for me to learn
+- C++
+- CMake
+- Test Driven Development
+- CI
+- OpenAL
+- OpenGL
+- Desktop App Programming
 
-***REMOVED*** is a project I am writing to learn
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
-***REMOVED***
+## Project Requirements
+- ISO C++ 11
+- CMake 3.1.0
 
-***REMOVED***
-***REMOVED***
+This project uses semantic versioning.
+This project uses the GitFlow model for managing branching.
+Branching off of master with the following format `release/MAJOR.MINOR` will trigger a deploy and will automatically tag the latest commit with that version.
+Merging into a release branch again will bump the patch version and release a patch for that release.
 
-
-***REMOVED***
-***REMOVED******REMOVED******REMOVED***
-
-***REMOVED***
-***REMOVED***
-***REMOVED***
+## Currently not accepting contributors
