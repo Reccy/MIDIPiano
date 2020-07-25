@@ -1,5 +1,6 @@
 MIDI Piano
 ==========
+[![Reccy](https://circleci.com/gh/Reccy/MIDIPiano.svg?style=shield)](https://app.circleci.com/pipelines/github/Reccy/MIDIPiano)
 
 A C++ Project by Aaron Meaney
 
