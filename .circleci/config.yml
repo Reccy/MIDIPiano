@@ -38,6 +38,21 @@ jobs:
                 name: Executing Test Runner
                 command: ./MidiPianoTestRunner.exe
                 working_directory: build/Release
+    deploy:
+        docker:
+            - image: cibuilds/github:0.10
+        steps:
+            - attach_workspace:
+                at: build
+            - run:
+                name: Tag Release Commit
+                command: ./tag-release-commit.py
+                working_directory: .circleci
+            - run:
+                name: Publish Release on GitHub
+                command: |
+                    VERSION=$(git tag --points-at HEAD)
+                    ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} ${VERSION} ./build/Release
 
 workflows:
     version: 2.1
@@ -47,3 +62,15 @@ workflows:
             - test:
                 requires:
                     - build
+            - deploy:
+                requires:
+                    - test
+                filters:
+                    branches:
+                        only: /release\/(\d+)\.(\d+)\.(\d+)(\/(alpha|beta|rc)(\d+)$|$)/
+
+# Branch Name Valid Values:
+# release/MAJOR.MINOR.PATCH					e.g. release/1.0.2
+# release/MAJOR.MINOR.PATCH/alphaVERSION	e.g. release/1.0.2/alpha1
+# release/MAJOR.MINOR.PATCH/betaVERSION		e.g. release/1.0.2/beta1
+# release/MAJOR.MINOR.PATCH/rcVERSION		e.g. release/1.0.2/rc1
