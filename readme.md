@@ -17,7 +17,7 @@ The purpose of this project is for me to learn
 - ISO C++ 11
 - CMake 3.1.0
 
-This project uses semantic versioning.
+This project uses [semantic versioning](https://semver.org/).
 This project uses the [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html) model for managing branching.
 Branching off of master with the following format `release/MAJOR.MINOR` will trigger a deploy and will automatically tag the latest commit with that version.
 Merging into a release branch again will bump the patch version and release a patch for that release.
