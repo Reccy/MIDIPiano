@@ -8,9 +8,15 @@ jobs:
         executor: win/default
         steps:
             - checkout
+            - restore_cache:
+                key: -v3-windows-{{ checksum ".circleci/install_windows_dependencies.ps1" }}
             - run:
-                name: Installing CMake using Chocolatey
-                command: choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
+                name: Installing Dependencies
+                command: .\.circleci\install_windows_dependencies.ps1
+            - save_cache:
+                key: -v3-windows-{{ checksum ".circleci/install_windows_dependencies.ps1" }}
+                paths:
+                    - 'C:\Program Files\CMake'
             - run:
                 name: Refreshing Powershell
                 command: refreshenv

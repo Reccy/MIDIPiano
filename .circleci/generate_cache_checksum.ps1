@@ -1,0 +1,1 @@
+Get-FileHash ".\.circleci\install_windows_dependencies.ps1"
