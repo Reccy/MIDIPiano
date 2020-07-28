@@ -9,11 +9,23 @@ jobs:
         steps:
             - checkout
             - run:
-                name: Installing CMake using Chocolatey
-                command: choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
+                name: Add CMake to Path
+                command: |
+                    SET CMAKE_EXEC_PATH="$Env:ProgramFiles\CMake\bin\cmake.exe"
+                    SET PATH=$CMAKE_EXEC_PATH;%PATH%
+            - restore_cache:
+                key: -cmake-v1-{{ (Get-Filehash $CMAKE_EXEC_PATH).Hash }}
             - run:
-                name: Refreshing Powershell
-                command: refreshenv
+                name: Download CMake
+                command: |
+                    $ProgressPreference = "SilentlyContinue"
+                    Invoke-WebRequest -URI https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4-win64-x64.zip -OutFile $Env:HOMEPATH\cmake-3.16.4-win64-x64.zip
+                    Expand-Archive $Env:HOMEPATH\cmake-3.16.4-win64-x64.zip -DestinationPath "$Env:ProgramFiles"
+                    Rename-Item "$Env:ProgramFiles\cmake-3.16.4-win64-x64" -NewName CMake
+            - save_cache:
+                key: -cmake-v1-{{ (Get-Filehash $CMAKE_EXEC_PATH).Hash }}
+                paths:
+                    - "$Env:ProgramFiles\\CMake"
             - run:
                 name: Creating build directory
                 command: mkdir build
