@@ -1,0 +1,18 @@
+build:
+  stage: build
+  script:
+    - choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
+    - refreshenv
+    - mkdir build
+    - cd build
+    - cmake ..
+    - cmake --build . --config Release
+  artifacts:
+    paths:
+      - build/Release
+
+test:
+  stage: test
+  script:
+    - cd build/Release
+    - ./MidiPianoTestRunner.exe
