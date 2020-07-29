@@ -1,11 +1,15 @@
 version: 2.1
 
-orbs:
-    win: circleci/windows@2.3.0
+executors:
+    windows:
+        machine:
+            image: "windows-server-2019-vs2019:stable"
+            resource_class: "windows.medium"
+            shell: powershell.exe -ExecutionPolicy Bypass
 
 jobs:
     build:
-        executor: win/default
+        executor: windows
         steps:
             - checkout
             - run:
@@ -30,7 +34,7 @@ jobs:
                 paths:
                     - Release
     test:
-        executor: win/default
+        executor: windows
         steps:
             - attach_workspace:
                 at: build
