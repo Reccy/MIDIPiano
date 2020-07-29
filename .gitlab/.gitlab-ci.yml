@@ -1,5 +1,7 @@
 build:
   stage: build
+  tags:
+    - windows
   script:
     - choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
     - refreshenv
@@ -13,6 +15,8 @@ build:
 
 test:
   stage: test
+  tags:
+    - windows
   script:
     - cd build/Release
     - ./MidiPianoTestRunner.exe
