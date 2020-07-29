@@ -37,13 +37,13 @@ deploy:
   rules:
   - if: '$CI_COMMIT_BRANCH =~ /release\/(\d+)\.(\d+)$/'
   script:
-    - Write-Host "Installing GitHub Release"
+    - echo "Installing GitHub Release"
     - go get -u github.com/tcnksm/ghr
-    - Write-Host "Add execute flag to generate_release_tag.sh"
+    - echo "Add execute flag to generate_release_tag.sh"
     - chmod +x .gitlab/generate_release_tag.sh
-    - Write-Host "Generating Release Tag"
+    - echo "Generating Release Tag"
     - VERSION=$(./.gitlab/generate_release_tag.sh)
-    - Write-Host "Publishing Release on GitHub"
+    - echo "Publishing Release on GitHub"
     - ghr -t "${GITHUB_TOKEN}" \
       -u "${GITLAB_USER_NAME}" \
       -r "${CI_PROJECT_NAME}" \
