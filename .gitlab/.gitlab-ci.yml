@@ -3,11 +3,17 @@ build:
   tags:
     - windows
   script:
+    - Write-Host "Installing CMake using Chocolatey"
     - choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=User'
+    - Write-Host "Refreshing Powershell"
     - refreshenv
+    - Write-Host "$Env:Path"
+    - Write-Host "Creating build directory"
     - mkdir build
+    - Write-Host "Generating build system with CMake"
     - cd build
     - cmake ..
+    - Write-Host "Building project in Release configuration"
     - cmake --build . --config Release
   artifacts:
     paths:
@@ -18,5 +24,6 @@ test:
   tags:
     - windows
   script:
+    - Write-Host "Executing Test Runner"
     - cd build/Release
     - ./MidiPianoTestRunner.exe
