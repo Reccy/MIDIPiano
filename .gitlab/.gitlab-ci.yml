@@ -2,8 +2,6 @@ build:
   stage: build
   tags:
     - windows
-  variables:
-    - PATH:
   script:
     - Write-Host "Installing CMake using Chocolatey"
     - choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
