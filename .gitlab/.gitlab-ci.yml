@@ -2,21 +2,7 @@ build:
   stage: build
   tags:
     - windows
-  script:
-    - Write-Host "Installing CMake using Chocolatey"
-    - choco install cmake -y --installargs 'ADD_CMAKE_TO_PATH=System'
-    - Write-Host "Refreshing Powershell"
-    - $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."   
-    - Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-    - refreshenv
-    - Write-Host "$Env:Path"
-    - Write-Host "Creating build directory"
-    - mkdir build
-    - Write-Host "Generating build system with CMake"
-    - cd build
-    - cmake ..
-    - Write-Host "Building project in Release configuration"
-    - cmake --build . --config Release
+  script: ./.gitlab/scripts/build.ps1
   artifacts:
     paths:
       - build/Release
@@ -25,10 +11,7 @@ test:
   stage: test
   tags:
     - windows
-  script:
-    - Write-Host "Executing Test Runner"
-    - cd build/Release
-    - ./MidiPianoTestRunner.exe
+  script: ./.gitlab/scripts/test.ps1
 
 deploy:
   stage: deploy
@@ -36,17 +19,4 @@ deploy:
     - linux
   rules:
   - if: '$CI_COMMIT_BRANCH =~ /release\/(\d+)\.(\d+)$/'
-  script:
-    - echo "Installing GitHub Release"
-    - go get -u github.com/tcnksm/ghr
-    - echo "Add execute flag to generate_release_tag.sh"
-    - chmod +x .gitlab/generate_release_tag.sh
-    - echo "Generating Release Tag"
-    - VERSION=$(./.gitlab/generate_release_tag.sh)
-    - echo "Publishing Release on GitHub"
-    - ghr -t "${GITHUB_TOKEN}" \
-      -u "${GITLAB_USER_NAME}" \
-      -r "${CI_PROJECT_NAME}" \
-      -c "${CI_COMMIT_SHA}" \
-      -delete "${VERSION}" \
-      ./build/Release
+  script: ./.gitlab/scripts/deploy.sh
