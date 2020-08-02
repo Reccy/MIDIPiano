@@ -1,5 +1,4 @@
 # MIDIPiano
-[![Reccy](https://circleci.com/gh/Reccy/MIDIPiano.svg?style=shield)](https://app.circleci.com/pipelines/github/Reccy/MIDIPiano)
 [![Reccy](https://img.shields.io/github/license/Reccy/MIDIPiano)](https://choosealicense.com/licenses/mit/)
 
 Play and visualise music on the desktop.
