@@ -25,14 +25,15 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: windows-test-exe
-        path: build/Release/MidiPiano.exe
+        path: build/Release/MidiPianoTestRunner.exe
     - name: Upload production executable
       uses: actions/upload-artifact@v2
       with:
         name: windows-prod-exe
-        path: build/Release/MidiPianoTestRunner.exe
+        path: build/Release/MidiPiano.exe
   test:
     runs-on: windows-latest
+    needs: build
     steps:
     - uses: actions/download-artifact@v2
       with:
