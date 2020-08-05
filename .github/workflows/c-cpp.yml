@@ -14,10 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Create build directory
-      run: |
-        mkdir build
-        cd build
+      run: mkdir build
     - name: Generate build system
-      run: cmake ..
+      run: |
+        cd build
+        cmake ..
     - name: Build project
-      run: cmake --build . --config Release
+      run: |
+        cd build
+        cmake --build . --config Release
