@@ -1,6 +1,6 @@
 # MIDIPiano
 
-[Build and Test]https://github.com/Reccy/MIDIPiano/workflows/Build%20and%20Test/badge.svg)
+![Build and Test]https://github.com/Reccy/MIDIPiano/workflows/Build%20and%20Test/badge.svg)
 
 [![Reccy](https://img.shields.io/github/license/Reccy/MIDIPiano)](https://choosealicense.com/licenses/mit/)
 
