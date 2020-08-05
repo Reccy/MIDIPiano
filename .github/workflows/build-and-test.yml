@@ -39,5 +39,5 @@ jobs:
       with:
         name: windows-test-exe
     - name: Run test runner
-      run: ./build/Release/MidiPianoTestRunner.exe
+      run: ./MidiPianoTestRunner.exe
       
