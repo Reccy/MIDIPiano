@@ -1,0 +1,43 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create build directory
+      run: mkdir build
+    - name: Generate build system
+      run: |
+        cd build
+        cmake ..
+    - name: Build project
+      run: |
+        cd build
+        cmake --build . --config Release
+    - name: Upload test executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-test-exe
+        path: build/Release/MidiPianoTestRunner.exe
+    - name: Upload production executable
+      uses: actions/upload-artifact@v2
+      with:
+        name: windows-prod-exe
+        path: build/Release/MidiPiano.exe
+  test:
+    runs-on: windows-latest
+    needs: build
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: windows-test-exe
+    - name: Run test runner
+      run: ./MidiPianoTestRunner.exe
+      
