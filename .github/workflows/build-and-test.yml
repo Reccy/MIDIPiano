@@ -43,8 +43,9 @@ jobs:
   trigger-deploy:
     runs-on: ubuntu-latest
     needs: test
+    if: contains(github.ref, "release/")
     steps:
-    - name: Trigger Deploy
+    - name: Trigger Deploy if on release branch
       uses: benc-uk/workflow-dispatch@v1
       with:
         workflow: Release
