@@ -15,7 +15,7 @@ jobs:
       shell: bash
       run: |
         BRANCH_NAME=$(echo ${{ steps.extract_branch.outputs.branch }})
-        REGEXP='^release/[0-9]+.[0-9]+.[0-9]+$'
+        REGEXP=^release/[0-9]+.[0-9]+.[0-9]+$
         [[ ! $BRANCH_NAME =~ $REGEXP ]] && exit 1
         MAJOR=${BASH_REMATCH[1]}
         MINOR=${BASH_REMATCH[2]}
