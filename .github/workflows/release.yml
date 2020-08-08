@@ -24,8 +24,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: 0.0.1
+        release_name: Release v0.0.1
         draft: true
         prerelease: true
     - name: Upload a Release Asset
@@ -33,7 +33,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.output_url }}
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: upload/MidiPiano.exe
         asset_name: midi-piano-${{ github.ref }}.exe
         asset_content_type: application/vnd.microsoft.portable-executable
