@@ -2,7 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ master ]
+    branches:
+    - master
+    - 'release/[0-9]+.[0-9]+.[0-9]+'
   pull_request:
     branches: [ master ]
 
@@ -40,4 +42,14 @@ jobs:
         name: windows-test-exe
     - name: Run test runner
       run: ./MidiPianoTestRunner.exe
-      
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    if: contains(github.ref, 'release/')
+    steps:
+    - name: Trigger Deploy if on release branch
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: Release
+        token: ${{ secrets.PERSONAL_TOKEN }}
+        ref: ${{ github.event.pull_request.head.ref }}

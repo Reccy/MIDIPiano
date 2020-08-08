@@ -1,0 +1,52 @@
+name: Release
+
+on: [ workflow_dispatch ]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Extract release branch version
+      id: branch_version
+      shell: bash
+      run: |
+        BRANCH_NAME=$(echo ${{ steps.extract_branch.outputs.branch }})
+        REGEXP='^release/([0-9]+).([0-9]+).([0-9]+)$'
+        [[ ! $BRANCH_NAME =~ $REGEXP ]] && exit 1
+        MAJOR=${BASH_REMATCH[1]}
+        MINOR=${BASH_REMATCH[2]}
+        PATCH=${BASH_REMATCH[3]}
+        echo "::set-output name=major::$(echo $MAJOR)"
+        echo "::set-output name=minor::$(echo $MINOR)"
+        echo "::set-output name=patch::$(echo $PATCH)"
+    - name: Download workflow artifact
+      uses: dawidd6/action-download-artifact@v2.7.0
+      with:
+        workflow: build-and-test.yml
+        branch: ${{ steps.extract_branch.outputs.branch }}
+        name: windows-prod-exe
+        path: ./upload/
+        github_token: ${{ secrets.PERSONAL_TOKEN }}
+    - name: Create a Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
+        release_name: Release v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: upload/MidiPiano.exe
+        asset_name: midi-piano-${{ steps.branch_version.outputs.major }}-${{ steps.branch_version.outputs.minor }}-${{ steps.branch_version.outputs.patch }}.exe
+        asset_content_type: application/vnd.microsoft.portable-executable
