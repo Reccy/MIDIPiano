@@ -46,7 +46,7 @@ jobs:
     steps:
     - name: Trigger Deploy if on release branch
       uses: benc-uk/workflow-dispatch@v1
-      if: contains(github.ref, "release/")
+      if: contains(github.ref, 'release/')
       with:
         workflow: Release
         token: ${{ secrets.PERSONAL_TOKEN }}
