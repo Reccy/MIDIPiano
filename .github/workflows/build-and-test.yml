@@ -40,6 +40,10 @@ jobs:
         name: windows-test-exe
     - name: Run test runner
       run: ./MidiPianoTestRunner.exe
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
     - name: Trigger Deploy
       uses: benc-uk/workflow-dispatch@v1
       with:
