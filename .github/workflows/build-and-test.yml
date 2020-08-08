@@ -40,3 +40,9 @@ jobs:
         name: windows-test-exe
     - name: Run test runner
       run: ./MidiPianoTestRunner.exe
+    - name: Trigger Deploy
+      uses: benc-uk/workflow-dispatch@v1
+      with:
+        workflow: Release
+        token: ${{ secrets.PERSONAL_TOKEN }}
+        ref: ${{ github.event.pull_request.head.ref }}
