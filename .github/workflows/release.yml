@@ -20,12 +20,9 @@ jobs:
         MAJOR=${BASH_REMATCH[1]}
         MINOR=${BASH_REMATCH[2]}
         PATCH=${BASH_REMATCH[3]}
-        echo $MAJOR
-        echo $MINOR
-        echo $PATCH
-        echo "##[set-output name=major;]$(echo $MAJOR)"
-        echo "##[set-output name=minor;]$(echo $MINOR)"
-        echo "##[set-output name=patch;]$(echo $PATCH)"
+        echo "::set-output name=major::$(echo $MAJOR)"
+        echo "::set-output name=minor::$(echo $MINOR)"
+        echo "::set-output name=patch::$(echo $PATCH)"
     - name: Download workflow artifact
       uses: dawidd6/action-download-artifact@v2.7.0
       with:
