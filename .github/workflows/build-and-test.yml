@@ -47,6 +47,6 @@ jobs:
     - name: Trigger Deploy
       uses: benc-uk/workflow-dispatch@v1
       with:
-        workflow: Release
+        workflow: release.yml
         token: ${{ secrets.PERSONAL_TOKEN }}
         ref: ${{ github.event.pull_request.head.ref }}
