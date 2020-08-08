@@ -39,8 +39,8 @@ jobs:
       with:
         tag_name: v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
         release_name: Release v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
-        draft: true
-        prerelease: true
+        draft: false
+        prerelease: false
     - name: Upload Release Asset
       uses: actions/upload-release-asset@v1.0.2
       env:
