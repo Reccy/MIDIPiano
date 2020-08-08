@@ -6,9 +6,17 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/download-artifact@v2
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+    - name: Download workflow artifact
+      uses: dawidd6/action-download-artifact@v2.7.0
       with:
+        workflow: Build and Test
+        branch: ${{ steps.extract_branch.outputs.branch }}
         name: windows-prod-exe
+        path: ./upload/
     - name: Create a Release
       uses: actions/create-release@v1
       id: create_release
@@ -21,6 +29,6 @@ jobs:
       uses: actions/upload-release-asset@v1.0.2
       with:
         upload_url: ${{ steps.create_release.outputs.output_url }}
-        asset_path: MidiPiano.exe
+        asset_path: upload/MidiPiano.exe
         asset_name: midi-piano-${{ github.ref }}.exe
         asset_content_type: application/vnd.microsoft.portable-executable
