@@ -14,7 +14,7 @@ jobs:
       id: branch_version
       shell: bash
       run: |
-        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+        BRANCH_NAME=$(echo ${{ steps.extract_branch.outputs.branch }})
         REGEXP='^release/[0-9]+.[0-9]+.[0-9]+$'
         [[ ! $BRANCH_NAME =~ $REGEXP ]] && exit 1
         echo "##[set-output name=major;]$(echo ${BASH_REMATCH[1]})"
