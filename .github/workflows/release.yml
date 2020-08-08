@@ -17,6 +17,7 @@ jobs:
         branch: ${{ steps.extract_branch.outputs.branch }}
         name: windows-prod-exe
         path: ./upload/
+        github_token: ${{ secrets.PERSONAL_TOKEN }}
     - name: Create a Release
       uses: actions/create-release@v1
       id: create_release
