@@ -17,9 +17,15 @@ jobs:
         BRANCH_NAME=$(echo ${{ steps.extract_branch.outputs.branch }})
         REGEXP='^release/[0-9]+.[0-9]+.[0-9]+$'
         [[ ! $BRANCH_NAME =~ $REGEXP ]] && exit 1
-        echo "##[set-output name=major;]$(echo ${BASH_REMATCH[1]})"
-        echo "##[set-output name=minor;]$(echo ${BASH_REMATCH[2]})"
-        echo "##[set-output name=patch;]$(echo ${BASH_REMATCH[3]})"
+        MAJOR=${BASH_REMATCH[1]}
+        MINOR=${BASH_REMATCH[2]}
+        PATCH=${BASH_REMATCH[3]}
+        echo $MAJOR
+        echo $MINOR
+        echo $PATCH
+        echo "##[set-output name=major;]$(echo $MAJOR)"
+        echo "##[set-output name=minor;]$(echo $MINOR)"
+        echo "##[set-output name=patch;]$(echo $PATCH)"
     - name: Download workflow artifact
       uses: dawidd6/action-download-artifact@v2.7.0
       with:
