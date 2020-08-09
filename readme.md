@@ -21,7 +21,18 @@ The purpose of this project is for me to learn
 
 ## Branching Strategy
 This project uses [semantic versioning](https://semver.org/).
-This project uses the [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html) model for managing branching.
+This project uses a slightly modified version of the [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html) model for managing branching.
+The only change to the GitLab Flow model on this repo is that release branches also include the patch version, instead of just cherry picking onto the minor version.
 
-Branching off of master with the following format `release/MAJOR.MINOR` will trigger a deploy and will automatically tag the latest commit with that version.
-Merging into a release branch again will bump the patch version and release a patch for that release.
+### New Release
+Branching off of master with the following format `release/MAJOR.MINOR.PATCH` will trigger a deploy and will automatically tag the latest commit with that version.
+
+### Patch Release
+To patch an existing release, branch off of the release branch and bump the patch version.
+For example, if you want to patch `release/1.2.0`, you would:
+- Merge bugfixes into `master`
+- Branch `release/1.2.0` to `release/1.2.1`
+- Cherry-pick the fixes from `master` into `release/1.2.1`
+- Push `release/1.2.1` to the repo, triggering the pipeline
+
+It is important to ensure that the bugfixes are in master so that later releases also contain the fix, and the bug does not resurface.
