@@ -16,7 +16,7 @@ message="There is something wrong with your branch name $local_branch.\nBranch n
 
 if [[ ! $local_branch =~ $valid_branch_regex && ! $local_branch =~ $valid_release_regex ]]
 then
-    printf "$message"
+    printf "$message\n"
     exit 1
 fi
 
