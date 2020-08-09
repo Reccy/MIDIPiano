@@ -15,8 +15,8 @@ The purpose of this project is for me to learn
 
 ## Project Requirements
 - ISO C++ 11
-- CMake 3.1.0
-- git 2.9
+- CMake 3.1.0 or greater
+- git 2.9 or greater
 
 ## Local Setup
 *Currently not accepting contributions*
