@@ -3,8 +3,6 @@
 
 Play and visualise music on the desktop.
 
-*Currently not accepting contributions*
-
 ## Description
 The purpose of this project is for me to learn
 - C++
@@ -18,14 +16,45 @@ The purpose of this project is for me to learn
 ## Project Requirements
 - ISO C++ 11
 - CMake 3.1.0
+- git 2.9
 
-## Branching Strategy
-This project uses [semantic versioning](https://semver.org/).
+## Local Setup
+*Currently not accepting contributions*
+
+To begin contributing to this project, first run the script `.install/install.sh`.
+
+## Branching
+### Branch Names
+When creating a branch, you must reference it to a GitHub issue by the label and the issue ID.
+This is done by following this format:
+- `ISSUE_LABEL/ISSUE_ID`
+
+Examples of possible branch names attached to issues are:
+- `feature/57`
+- `infrastructure/47`
+- `doc/12`
+- `bug/35`
+
+Release branch names follow the [semantic versioning](https://semver.org/) format:
+- `release/MAJOR.MINOR.PATCH`
+
+For example:
+- `release/1.33.0`
+- `release/1.33.1`
+- `release/1.33.2`
+- `release/1.34.0`
+- `release/2.0.0`
+
+### Branching Strategy
 This project uses a slightly modified version of the [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html) model for managing branching.
-The only change to the GitLab Flow model on this repo is that release branches also include the patch version, instead of just cherry picking onto the minor version.
+The only difference is that release branches also include the patch version.
+
+All commits will be squashed before merging into `master`.
 
 ### New Release
-Branching off of `master` with the following format `release/MAJOR.MINOR.PATCH` will trigger a deploy and will automatically tag the latest commit with that version.
+Branch off of `master` with the following format `release/MAJOR.MINOR.PATCH` to trigger a release GitHub Action workflow.
+The workflow will automatically tag the latest commit with the version in the branch name. E.g. `v1.33.2`
+The workflow will then build the project, run tests, and create a new release with a downloadable executable.
 
 ### Patch Release
 To patch an existing release, branch off of the release branch and bump the patch version.
