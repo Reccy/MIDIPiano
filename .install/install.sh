@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 LC_ALL=C
 
+function cd_to_app {
+	cd "$(dirname "$(dirname "$(readlink -fm "$0")")")"
+}
+
 function log {
 	printf "$1\n"
 }
@@ -78,4 +82,4 @@ function run {
 	log "Finished installing local environment"
 }
 
-run
+(cd_to_app && run)
