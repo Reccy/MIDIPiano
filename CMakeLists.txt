@@ -61,4 +61,6 @@ target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}")
 set(CUSTOM_COMPILE_FLAGS "")
 list(APPEND CUSTOM_COMPILE_FLAGS "/W4")		# Highest warning level in MSVC
 list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
-target_compile_options("${PROJECT_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+target_compile_options("${LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+target_compile_options("${EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
