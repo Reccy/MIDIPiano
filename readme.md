@@ -14,8 +14,8 @@ The purpose of this project is for me to learn
 - Desktop App Programming
 
 ## Project Requirements
-- ISO C++ 11
-- CMake 3.1.0 or greater
+- C++ 17
+- CMake 3.15.0 or greater
 - git 2.9 or greater
 
 ## Local Setup

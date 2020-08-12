@@ -2,4 +2,4 @@
 
 int MidiPiano::test_func() {
 	return 300;
-};
+}
