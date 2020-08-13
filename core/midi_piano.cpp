@@ -2,5 +2,5 @@
 
 int MidiPiano::test_func() {
 	// blah
-	return 300;
+    return 300;
 }
