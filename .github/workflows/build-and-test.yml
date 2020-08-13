@@ -9,6 +9,20 @@ on:
     branches: [ master ]
 
 jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Static code analysis
+      uses: deep5050/cppcheck-action@1.1.1
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        output_file: cppcheck_report.txt
+    - name: Upload static analysis report
+      uses: actions/upload-artifact@v2
+      with:
+        name: cppcheck_report.txt
+        path: cppcheck_report.txt
   build:
     runs-on: windows-latest
     steps:
@@ -23,16 +37,6 @@ jobs:
       run: |
         cd build
         cmake --build . --config Release
-    - name: Static code analysis
-      uses: deep5050/cppcheck-action@1.1.1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        output_file: cppcheck_report.txt
-    - name: Upload static analysis report
-      uses: actions/upload-artifact@v2
-      with:
-        name: cppcheck_report.txt
-        path: cppcheck_report.txt
     - name: Upload test executable
       uses: actions/upload-artifact@v2
       with:
