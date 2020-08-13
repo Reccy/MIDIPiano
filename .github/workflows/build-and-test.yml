@@ -13,16 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - name: Install cppcheck
+    run: sudo apt-get install -y cppcheck
     - name: Static code analysis
-      uses: deep5050/cppcheck-action@1.1.1
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        output_file: cppcheck_report.txt
+    run: cppcheck --enable=all --inconclusive --xml-version=2 --output-file=cppcheck-report.xml -v core main test
     - name: Upload static analysis report
       uses: actions/upload-artifact@v2
       with:
-        name: cppcheck_report.txt
-        path: cppcheck_report.txt
+        name: cppcheck-report.xml
+        path: cppcheck-report.xml
   build:
     runs-on: windows-latest
     steps:
