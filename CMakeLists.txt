@@ -9,9 +9,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 #
-# Google Test Setup
+# Compile Flags Setup
 #
-include("cmake/SetupGoogleTest.cmake")
+set(CUSTOM_COMPILE_FLAGS "")
+list(APPEND CUSTOM_COMPILE_FLAGS "/W4")		# Highest warning level in MSVC
+list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
 
 #
 # Library Setup
@@ -28,18 +30,24 @@ set(LIBRARY_SOURCES
 )
 
 add_library("${LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
+target_compile_options("${LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 #
 # Test Suite Setup
 #
+include("cmake/SetupGoogleTest.cmake")
 set(TEST_SUITE_DIR "test")
 set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
- "test/core/${PROJECT_NAME_SNAKE_CASE}_test.cpp")
+	"test/core/${PROJECT_NAME_SNAKE_CASE}_test.cpp")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
 target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${LIBRARY_NAME}")
+target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+
+enable_testing()
+add_test(NAME "${TEST_RUNNER_EXECUTABLE_NAME}" COMMAND "${TEST_RUNNER_EXECUTABLE_NAME}")
 
 #
 # Executable Setup
@@ -54,13 +62,4 @@ set(EXECUTABLE_SOURCES
 add_executable("${EXECUTABLE_NAME}" "${EXECUTABLE_SOURCES}")
 target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
 target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}")
-
-#
-# Compile Flags Setup
-#
-set(CUSTOM_COMPILE_FLAGS "")
-list(APPEND CUSTOM_COMPILE_FLAGS "/W4")		# Highest warning level in MSVC
-list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
-target_compile_options("${LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 target_compile_options("${EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
-target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
