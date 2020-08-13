@@ -14,9 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install cppcheck
-    run: sudo apt-get install -y cppcheck
+      run: sudo apt-get install -y cppcheck
     - name: Static code analysis
-    run: cppcheck --enable=all --inconclusive --xml-version=2 --output-file=cppcheck-report.xml -v core main test
+      run: cppcheck --enable=all --inconclusive --xml-version=2 --output-file=cppcheck-report.xml -v core main test
     - name: Upload static analysis report
       uses: actions/upload-artifact@v2
       with:
