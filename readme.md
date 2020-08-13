@@ -1,5 +1,5 @@
 # MIDIPiano
-![Build and Test](https://github.com/Reccy/MIDIPiano/workflows/Build%20and%20Test/badge.svg) [![Reccy](https://img.shields.io/github/license/Reccy/MIDIPiano)](https://choosealicense.com/licenses/mit/)
+![Build and Test](https://github.com/Reccy/MIDIPiano/workflows/Build%20and%20Test/badge.svg) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/ff87ca54e8b94a60b9b0329bffcd7992)](https://www.codacy.com/manual/Reccy/MIDIPiano?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Reccy/MIDIPiano&amp;utm_campaign=Badge_Grade) [![Reccy](https://img.shields.io/github/license/Reccy/MIDIPiano)](https://choosealicense.com/licenses/mit/)
 
 Play and visualise music on the desktop.
 
@@ -14,8 +14,8 @@ The purpose of this project is for me to learn
 - Desktop App Programming
 
 ## Project Requirements
-- ISO C++ 11
-- CMake 3.1.0 or greater
+- C++ 17
+- CMake 3.15.0 or greater
 - git 2.9 or greater
 
 ## Local Setup

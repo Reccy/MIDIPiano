@@ -3,6 +3,6 @@
 #endif // _MIDI_PIANO_H
 
 class MidiPiano {
-	public:
-		int test_func();
+public:
+	int test_func();
 };
