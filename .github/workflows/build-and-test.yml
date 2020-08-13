@@ -9,19 +9,6 @@ on:
     branches: [ master ]
 
 jobs:
-  static-analysis:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Install cppcheck
-      run: sudo apt-get install -y cppcheck
-    - name: Static code analysis
-      run: cppcheck --enable=all --inconclusive --xml-version=2 --output-file=cppcheck-report.xml -v core main test
-    - name: Upload static analysis report
-      uses: actions/upload-artifact@v2
-      with:
-        name: cppcheck-report.xml
-        path: cppcheck-report.xml
   build:
     runs-on: windows-latest
     steps:
