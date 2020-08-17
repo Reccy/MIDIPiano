@@ -9,4 +9,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## \[Unreleased]
 
 ### Added
-  - Initial Changelog (<https://github.com/Reccy/MIDIPiano/issues/58>)
+- Initial Changelog (<https://github.com/Reccy/MIDIPiano/issues/58>)
