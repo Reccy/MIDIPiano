@@ -28,7 +28,7 @@ jobs:
       run: |
         RELEASE_DATE=$(date '+%Y-%m-%d')
         VERSION=${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
-        SEARCH_STRING = "## [$VERSION] - $RELEASE_DATE"
+        SEARCH_STRING="## [$VERSION] - $RELEASE_DATE"
 
         if [ ! -f changelog.md ]; then
             echo "Could not find changelog.md - please ensure it is in repo root directory!"
