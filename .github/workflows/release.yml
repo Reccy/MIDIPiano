@@ -23,6 +23,24 @@ jobs:
         echo "::set-output name=major::$(echo $MAJOR)"
         echo "::set-output name=minor::$(echo $MINOR)"
         echo "::set-output name=patch::$(echo $PATCH)"
+    - name: Validate changelog exists
+      shell: bash
+      run: |
+        RELEASE_DATE=$(date '+%Y-%m-%d')
+        VERSION=${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
+        SEARCH_STRING = "## [$VERSION] - $RELEASE_DATE"
+
+        if [ ! -f changelog.md ]; then
+            echo "Could not find changelog.md - please ensure it is in repo root directory!"
+            exit 1
+        fi
+
+        if grep -Fq "$SEARCH_STRING" changelog.md; then
+          echo "Found valid changelog entry for version $VERSION on release date $RELEASE_DATE"
+        else
+          echo "Could not find changelog entry for version $VERSION on release date $RELEASE_DATE"
+          exit 1
+        end
     - name: Download workflow artifact
       uses: dawidd6/action-download-artifact@v2.7.0
       with:

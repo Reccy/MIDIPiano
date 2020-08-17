@@ -23,6 +23,8 @@ The purpose of this project is for me to learn
 
 To begin contributing to this project, first run the script `.install/install.sh`.
 
+Each Pull Request requires a `readme.md` entry.
+
 ## Branching
 ### Branch Names
 When creating a branch, you must reference it to a GitHub issue by the label and the issue ID.
