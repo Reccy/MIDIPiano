@@ -41,7 +41,7 @@ jobs:
         else
           echo "Could not find changelog entry for version $VERSION on release date $RELEASE_DATE"
           exit 1
-        end
+        fi
     - name: Download workflow artifact
       uses: dawidd6/action-download-artifact@v2.7.0
       with:
