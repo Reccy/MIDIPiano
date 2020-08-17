@@ -27,7 +27,7 @@ jobs:
     - name: Validate changelog exists
       shell: bash
       run: |
-        RELEASE_DATE=$(date '+%Y-%m-%d')
+        RELEASE_DATE=$(TZ=UTC date '+%Y-%m-%d')
         VERSION=${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
         SEARCH_STRING="## [$VERSION] - $RELEASE_DATE"
 
