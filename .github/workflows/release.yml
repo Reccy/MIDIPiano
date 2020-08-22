@@ -60,7 +60,7 @@ jobs:
         while IFS="" read -r p || [ -n "$p" ]
         do
           echo "Checking line ${p}"
-          if [[ $p =~ BEGIN_DELIMETER_REGEXP ]]; then
+          if [[ $p =~ $BEGIN_DELIMETER_REGEXP ]]; then
             echo "Found first delimeter"
             FOUND_FIRST_DELIMETER=1
             continue
@@ -69,15 +69,15 @@ jobs:
             echo "Did not find first delimeter - skipping line"
             continue
           fi
-          if [[ $p =~ END_DELIMETER_REGEXP ]]; then
+          if [[ $p =~ $END_DELIMETER_REGEXP ]]; then
             echo "Found last delimeter - stopping parse"
             break
           fi
-          if [[ FOUND_FIRST_LINE == 0 && -z "$p" ]]; then
+          if [[ $FOUND_FIRST_LINE == 0 && -z "$p" ]]; then
             echo "Found blank line but not first line with text - skipping line"
             continue
           fi
-          if [[ FOUND_FIRST_LINE == 0 ]]; then
+          if [[ $FOUND_FIRST_LINE == 0 ]]; then
             echo "Found first line of text"
             FOUND_FIRST_LINE=1
           fi
