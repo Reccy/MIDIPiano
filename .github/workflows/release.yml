@@ -82,7 +82,7 @@ jobs:
             FOUND_FIRST_LINE=1
           fi
           echo "Adding line to CHANGELOG: ${p}"
-          CHANGELOG="${CHANGELOG}${p}\n"
+          CHANGELOG="${CHANGELOG}${p}<br />"
         done < changelog.md
         echo "Changelog:"
         echo "$CHANGELOG"
