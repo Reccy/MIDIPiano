@@ -18,12 +18,32 @@ The purpose of this project is for me to learn
 - CMake 3.15.0 or greater
 - git 2.9 or greater
 
-## Local Setup
+## Contributing
 *Currently not accepting contributions*
 
-To begin contributing to this project, first run the script `.install/install.sh`.
+### Setup
+To setup the local environment for development on this project, first run the script `install/install.sh`.
 
-Each Pull Request requires a `readme.md` entry.
+### Pull Requests
+Each Pull Request requires a `changelog.md` entry with the format:
+`-   Short summary of change (ticket-url)`
+The entry should be placed under the `Unreleased` category.
+
+### Releases
+When creating a release, perform the following steps:
+1. Update changelog on feature branch (See [Updating Changelog for Release])
+2. Merge pull request to master
+3. Ensure CI pipeline passes on master
+4. Create a release branch off of master (See [New Release])
+
+#### Updating Changelog for Release
+Change the `Unreleased` category in `changelog.md` to match the following format:
+`## \[MAJOR.MINOR.PATCH] - YYYY-MM-DD`
+For example:
+`## \[1.2.12] - 2020-04-02`
+
+This allows the build pipeline to generate the changelog for the GitHub Release page.
+If there is no section in the changelog for that release branch on the correct release date *(in UTC)*, then the pipeline will intentionally fail.
 
 ## Branching
 ### Branch Names
