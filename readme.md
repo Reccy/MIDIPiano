@@ -59,10 +59,10 @@ The entry should be placed under the `Unreleased` category.
 
 ### Releases
 When creating a release, perform the following steps:
-1. Update changelog on feature branch (See [Updating Changelog for Release])
+1. Update changelog on feature branch ([See Updating Changelog for Release](https://github.com/Reccy/MIDIPiano/tree/master#updating-changelog-for-release))
 2. Merge pull request to master
 3. Ensure CI pipeline passes on master
-4. Create a release branch off of master (See [New Release])
+4. Create a release branch off of master ([See New Release](https://github.com/Reccy/MIDIPiano/tree/master#new-release))
 
 #### Updating Changelog for Release
 Change the `Unreleased` category in `changelog.md` to match the following format:
