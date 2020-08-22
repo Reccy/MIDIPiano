@@ -59,20 +59,20 @@ jobs:
         CHANGEOG=""
         while IFS="" read -r p || [ -n "$p" ]
         do
-          if [[ $p =~ BEGIN_DELIMETER_REGEXP ]] then;
+          if [[ $p =~ BEGIN_DELIMETER_REGEXP ]]; then
             FOUND_FIRST_DELIMETER=1
             continue
           fi
-          if [[ $FOUND_FIRST_DELIMETER == 0 ]] then;
+          if [[ $FOUND_FIRST_DELIMETER == 0 ]]; then
             continue
           fi
-          if [[ $p =~ END_DELIMETER_REGEXP ]] then;
+          if [[ $p =~ END_DELIMETER_REGEXP ]]; then
             break
           fi
-          if [[ FOUND_FIRST_LINE == 0 && -z "$p" ]] then;
+          if [[ FOUND_FIRST_LINE == 0 && -z "$p" ]]; then
             continue
           fi
-          if [[ FOUND_FIRST_LINE == 0 ]] then;
+          if [[ FOUND_FIRST_LINE == 0 ]]; then
             FOUND_FIRST_LINE=1
           fi
           CHANGELOG="${CHANGELOG}${p}"
