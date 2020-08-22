@@ -57,6 +57,7 @@ jobs:
         FOUND_FIRST_DELIMETER=0
         FOUND_FIRST_LINE=0
         CHANGELOG=""
+        NEWLINE=$'\n'
         while IFS="" read -r p || [ -n "$p" ]
         do
           echo "Checking line ${p}"
@@ -82,7 +83,7 @@ jobs:
             FOUND_FIRST_LINE=1
           fi
           echo "Adding line to CHANGELOG: ${p}"
-          CHANGELOG="${CHANGELOG}${p}  " # End with two spaces to simulate line break
+          CHANGELOG="${CHANGELOG}${p}${NEWLINE}"
         done < changelog.md
         echo "Changelog:"
         echo "$CHANGELOG"
