@@ -32,29 +32,38 @@ When developing on this project, tracking code changes are done on 3 different l
 
 #### Pull Requests
 Pull Request descriptions and comments should explain why you're changing the code in the pull request.
-Ideally it should match the changes requested in the attached issue.
-Make sure that the last line of the Pull Request description closes the appropriate issue ID.
+
+Ideally it should match the changes requested in the attached issue.  
+
+Make sure that the last line of the Pull Request description closes the appropriate issue ID.  
 E.g. `Closes #24`.
 
 #### Commit Messages
 Commit Messages should give a history to the work done on a branch.
-They should describe what changed and be written in the present tense.
+
+They should describe what changed and be written in the present tense.  
 E.g. `Change AudioClip::get_duration() return type to float`
 
+
 When squashing commits to be merged to master, the title of the commit should match the issue name.
+
 The squashed commit messages can then be referenced in the extended description of the message to describe all of the changes.
-It's okay to delete commit messages that are no longer relevant in the description.
+
+It's okay to delete commit messages that are no longer relevant in the description.  
 E.g. `WIP 2 FINAL`
 
 #### Changelog Entries
 Changelog Entries should describe what behaviour changed in the app that is obvious to the user.
+
 If it's something simple like a refactoring where no behaviour changed, then it's okay to just say `Refactor AudioClip class` and to link the appropriate ticket.
-For something else like a bug or new feature, a longer description and a link to the issue is necessary.
+
+For something else like a bug or new feature, a longer description and a link to the issue is necessary.  
 E.g. `Add mute audio keyboard shortcut`
 
 ### Pull Requests
-Each Pull Request requires a `changelog.md` entry with the format:
+Each Pull Request requires a `changelog.md` entry with the format:  
 `-   Short summary of change (ticket-url)`
+
 The entry should be placed under the `Unreleased` category.
 
 ### Releases
@@ -65,12 +74,14 @@ When creating a release, perform the following steps:
 4. Create a release branch off of master ([See New Release](https://github.com/Reccy/MIDIPiano/tree/master#new-release))
 
 #### Updating Changelog for Release
-Change the `Unreleased` category in `changelog.md` to match the following format:
+Change the `Unreleased` category in `changelog.md` to match the following format:  
 `## \[MAJOR.MINOR.PATCH] - YYYY-MM-DD`
-For example:
+
+For example:  
 `## \[1.2.12] - 2020-04-02`
 
 This allows the build pipeline to generate the changelog for the GitHub Release page.
+
 If there is no section in the changelog for that release branch on the correct release date *(in UTC)*, then the pipeline will intentionally fail.
 
 ## Branching
@@ -103,7 +114,9 @@ All commits will be squashed before merging into `master`.
 
 ### New Release
 Branch off of `master` with the following format `release/MAJOR.MINOR.PATCH` to trigger a release GitHub Action workflow.
+
 The workflow will automatically tag the latest commit with the version in the branch name. E.g. `v1.33.2`
+
 The workflow will then build the project, run tests, and create a new release with a downloadable executable.
 
 ### Patch Release
