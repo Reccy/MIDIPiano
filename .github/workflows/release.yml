@@ -57,7 +57,7 @@ jobs:
         FOUND_FIRST_DELIMETER=0
         FOUND_FIRST_LINE=0
         CHANGELOG=""
-        NEWLINE=$'\n'
+        NEWLINE='%0A'
         while IFS="" read -r p || [ -n "$p" ]
         do
           echo "Checking line ${p}"
