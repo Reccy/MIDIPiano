@@ -16,7 +16,7 @@ list(APPEND CUSTOM_COMPILE_FLAGS "/W4")		# Highest warning level in MSVC
 list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
 
 #
-# Library Setup
+# Core Library Setup
 #
 set(LIBRARY_DIR "core")
 set(LIBRARY_NAME "${PROJECT_NAME}Core")
@@ -31,6 +31,18 @@ set(LIBRARY_SOURCES
 
 add_library("${LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
 target_compile_options("${LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+
+#
+# Third Party Library Setup
+#
+set(THIRD_PARTY_LIBS_DIR "lib")
+
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIRS})
+list(APPEND THIRD_PARTY_LIBS ${OPENGL_LIBRARIES})
+
+add_subdirectory("${THIRD_PARTY_LIBS_DIR}/glad")
+list(APPEND THIRD_PARTY_LIBS "glad")
 
 #
 # Test Suite Setup
@@ -59,7 +71,7 @@ set(EXECUTABLE_SOURCES
 	"${EXECUTABLE_DIR}/main.cpp"
 )
 
-add_executable("${EXECUTABLE_NAME}" "${EXECUTABLE_SOURCES}")
+add_executable("${EXECUTABLE_NAME}" WIN32 "${EXECUTABLE_SOURCES}")
 target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
-target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}")
+target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}" "${THIRD_PARTY_LIBS}")
 target_compile_options("${EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
