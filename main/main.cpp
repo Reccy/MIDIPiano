@@ -2,13 +2,21 @@
 #define UNICODE
 #endif
 
+#pragma warning(push)
+#pragma warning(disable: 4244)
 #include <windows.h>
-#include <sstream>
-#include <string.h>
 #include <wingdi.h>
-#include <iostream>
-#include "glad.h"
+
 #include <cassert>
+
+#include <sstream>
+#include <string>
+#include <set>
+#include <algorithm>
+#include <iostream>
+
+#include "glad.h"
+#pragma warning(pop)
 
 #define global static
 #define internal static
@@ -19,7 +27,7 @@ global struct MIDI_PIANO {
 } MIDI_PIANO;
 
 global int globalWindowWidth = 400;
-global int globalWindowHeight = 250;
+global int globalWindowHeight = 300;
 
 internal bool loadWithLoadGLLoader()
 {
@@ -193,9 +201,134 @@ void writeBlank()
 	writeText(L"");
 }
 
-void handleCharacter(LPCSTR character)
+struct Note
 {
-	OutputDebugStringA(character);
+	int id;			// 32 bits (4-byte aligned)
+	char name[4];	// 32 bits (4-byte aligned)
+};
+
+Note A0{ 0, "A0" };
+Note ASharp0{ 1, "A#0" };
+Note B0{ 2, "B0" };
+Note C1{ 3, "C1" };
+Note CSharp1{ 4, "C#1" };
+Note D1{ 5, "D1" };
+Note DSharp1{ 6, "D#1" };
+Note E1{ 7, "E1" };
+Note F1{ 8, "F1" };
+Note FSharp1{ 9, "F#1" };
+Note G1{ 10, "G1" };
+Note GSharp1{ 11, "G#1" };
+Note A1{ 12, "A1" };
+Note ASharp1{ 13, "A#1" };
+Note B1{ 14, "B1" };
+Note C2{ 15, "C2" };
+Note CSharp2{ 16, "C#2" };
+Note D2{ 17, "D2" };
+Note DSharp2{ 18, "D#2" };
+Note E2{ 19, "E2" };
+Note F2{ 20, "F2" };
+Note FSharp2{ 21, "F#2" };
+Note G2{ 22, "G2" };
+Note GSharp2{ 23, "G#2" };
+Note A2{ 24, "A2" };
+Note ASharp2{ 25, "A#2" };
+Note B2{ 26, "B2" };
+Note C3{ 27, "C3" };
+Note CSharp3{ 28, "C#3" };
+Note D3{ 29, "D3" };
+Note DSharp3{ 30, "D#3" };
+Note E3{ 31, "E3" };
+Note F3{ 32, "F3" };
+Note FSharp3{ 33, "F#3" };
+Note G3{ 34, "G3" };
+Note GSharp3{ 35, "G#3" };
+Note A3{ 36, "A3" };
+Note ASharp3{ 37, "A#3" };
+Note B3{ 38, "B3" };
+Note C4{ 39, "C4" };
+Note CSharp4{ 40, "C#4" };
+Note D4{ 41, "D4" };
+Note DSharp4{ 42, "D#4" };
+Note E4{ 43, "E4" };
+Note F4{ 44, "F4" };
+Note FSharp4{ 45, "F#4" };
+Note G4{ 46, "G4" };
+Note GSharp4{ 47, "G#4" };
+Note A4{ 48, "A4" };
+Note ASharp4{ 49, "A#4" };
+Note B4{ 50, "B4" };
+Note C5{ 51, "C5" };
+Note CSharp5{ 52, "C#5" };
+Note D5{ 53, "D5" };
+Note DSharp5{ 54, "D#5" };
+Note E5{ 55, "E5" };
+Note F5{ 56, "F5" };
+Note FSharp5{ 57, "F#5" };
+Note G5{ 58, "G5" };
+Note GSharp5{ 59, "G#5" };
+Note A5{ 60, "A5" };
+Note ASharp5{ 61, "A#5" };
+Note B5{ 62, "B5" };
+Note C6{ 63, "C6" };
+Note CSharp6{ 64, "C#6" };
+Note D6{ 65, "D6" };
+Note DSharp6{ 66, "D#6" };
+Note E6{ 67, "E6" };
+Note F6{ 68, "F6" };
+Note FSharp6{ 69, "F#6" };
+Note G6{ 70, "G6" };
+Note GSharp6{ 71, "G#6" };
+Note A6{ 72, "A6" };
+Note ASharp6{ 73, "A#6" };
+Note B6{ 74, "B6" };
+Note C7{ 75, "C7" };
+Note CSharp7{ 76, "C#7" };
+Note D7{ 77, "D7" };
+Note DSharp7{ 78, "D#7" };
+Note E7{ 79, "E7" };
+Note F7{ 80, "F7" };
+Note FSharp7{ 81, "F#7" };
+Note G7{ 82, "G7" };
+Note GSharp7{ 83, "G#7" };
+Note A7{ 84, "A7" };
+Note ASharp7{ 85, "A#7" };
+Note B7{ 86, "B7" };
+Note C8{ 87, "C8" };
+
+std::set<Note*> sustained_notes {};
+
+void playNote(Note*)
+{
+	return;
+}
+
+// NOTE(aaron.meaney): This will essentially be the keymapper, it is hard coded at the moment
+Note* stringToNote(std::string character)
+{
+	std::transform(character.begin(), character.end(), character.begin(), std::toupper);
+
+	Note* note{};
+
+	// NOTE(aaron.meaney): This is terrible, terrible code - replace this once I get to the proper keymapper feature
+	if (character == "Z") { note = &C3; }
+	if (character == "S") { note = &CSharp3; }
+	if (character == "X") { note = &D3; }
+	if (character == "D") { note = &DSharp3; }
+	if (character == "C") { note = &E3; }
+	if (character == "V") { note = &F3; }
+	if (character == "G") { note = &FSharp3; }
+	if (character == "B") { note = &G3; }
+	if (character == "H") { note = &GSharp3; }
+	if (character == "N") { note = &A3; }
+	if (character == "J") { note = &ASharp3; }
+	if (character == "M") { note = &B3; }
+
+	if (note == nullptr) {
+		return nullptr;
+	}
+
+	return note;
 }
 
 LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam)
@@ -232,21 +365,47 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 			writeBlank();
 			writeText(L"By Aaron Meaney");
 			writeText(L"13/09/2020");
-			writeBlank();
-			writeText(L"Please use your keyboard to play musical tones");
-			writeText(L"C C# D D# E F F# G G# A A# B");
-			writeText(L"Z S  X D  C V G  B H  N J  M");
+
+			std::wstringstream ss;
+
+			for (auto it = sustained_notes.begin(); it != sustained_notes.end(); ++it)
+			{
+				Note* note = *it;
+				ss << note->name;
+				ss << " ";
+			}
+
+			writeText(ss.str().c_str());
 
 			EndPaint(windowHandle, &paint);
 			break;
 		}
-		case WM_CHAR:
+		case WM_KEYDOWN:
 		{
-			OutputDebugString(L"WM_CHAR\n");
+			LPCSTR character = (LPCSTR)&wParam;
+			Note* note = stringToNote(character);
 
-			LPCSTR c = (LPCSTR)&wParam;
+			if (note != nullptr)
+			{
+				sustained_notes.insert(note);
+			}
 
-			handleCharacter(c);
+			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
+
+			break;
+		}
+		case WM_KEYUP:
+		{
+			LPCSTR character = (LPCSTR)&wParam;
+			Note* note = stringToNote(character);
+
+			if (note != nullptr)
+			{
+				sustained_notes.erase(note);
+			}
+
+			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
+
 			break;
 		}
 		case WM_CLOSE:
