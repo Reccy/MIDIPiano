@@ -44,6 +44,8 @@ list(APPEND THIRD_PARTY_LIBS ${OPENGL_LIBRARIES})
 add_subdirectory("${THIRD_PARTY_LIBS_DIR}/glad")
 list(APPEND THIRD_PARTY_LIBS "glad")
 
+list(APPEND THIRD_PARTY_LIBS "winmm.lib")
+
 #
 # Test Suite Setup
 #
