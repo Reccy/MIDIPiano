@@ -25,6 +25,8 @@
 global struct MIDI_PIANO {
 	HINSTANCE appInstance;
 	HGLRC openGlRenderingContext;
+	HWND windowHandle;
+	HMIDIOUT midiOutHandle;
 } MIDI_PIANO;
 
 global int globalWindowWidth = 400;
@@ -135,6 +137,20 @@ internal bool initOpenGl(HWND windowHandle)
 	return true;
 }
 
+internal void centerWindow(HWND windowHandle)
+{
+	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+	RECT windowRect = {};
+	GetWindowRect(windowHandle, &windowRect);
+
+	int windowWidth = windowRect.right - windowRect.left;
+	int windowHeight = windowRect.bottom - windowRect.top;
+
+	SetWindowPos(windowHandle, NULL, screenWidth / 2 - windowWidth, screenHeight / 2 - windowHeight, 0, 0, SWP_SHOWWINDOW);
+}
+
 internal HWND createWindow(WNDCLASS windowClass)
 {
 	if (!RegisterClass(&windowClass))
@@ -156,6 +172,8 @@ internal HWND createWindow(WNDCLASS windowClass)
 		NULL
 	);
 
+	centerWindow(windowHandle);
+
 	if (!windowHandle) {
 		return NULL;
 	}
@@ -165,7 +183,7 @@ internal HWND createWindow(WNDCLASS windowClass)
 
 internal void runLoop()
 {
-	OutputDebugString(L"Running Message Loop");
+	OutputDebugString(L"Running Message Loop\n");
 
 	MSG message = {};
 	while (GetMessage(&message, 0, 0, 0) > 0)
@@ -407,105 +425,140 @@ std::string getTechnology(WORD technology)
 
 struct Note
 {
-	int id;				// 32 bits (4-byte aligned)
-	const char name[4];	// 32 bits (4-byte aligned)
+	byte id;
+	const char name[8];
 };
 
-Note A0{ 0, "A0" };
-Note ASharp0{ 1, "A#0" };
-Note B0{ 2, "B0" };
-Note C1{ 3, "C1" };
-Note CSharp1{ 4, "C#1" };
-Note D1{ 5, "D1" };
-Note DSharp1{ 6, "D#1" };
-Note E1{ 7, "E1" };
-Note F1{ 8, "F1" };
-Note FSharp1{ 9, "F#1" };
-Note G1{ 10, "G1" };
-Note GSharp1{ 11, "G#1" };
-Note A1{ 12, "A1" };
-Note ASharp1{ 13, "A#1" };
-Note B1{ 14, "B1" };
-Note C2{ 15, "C2" };
-Note CSharp2{ 16, "C#2" };
-Note D2{ 17, "D2" };
-Note DSharp2{ 18, "D#2" };
-Note E2{ 19, "E2" };
-Note F2{ 20, "F2" };
-Note FSharp2{ 21, "F#2" };
-Note G2{ 22, "G2" };
-Note GSharp2{ 23, "G#2" };
-Note A2{ 24, "A2" };
-Note ASharp2{ 25, "A#2" };
-Note B2{ 26, "B2" };
-Note C3{ 27, "C3" };
-Note CSharp3{ 28, "C#3" };
-Note D3{ 29, "D3" };
-Note DSharp3{ 30, "D#3" };
-Note E3{ 31, "E3" };
-Note F3{ 32, "F3" };
-Note FSharp3{ 33, "F#3" };
-Note G3{ 34, "G3" };
-Note GSharp3{ 35, "G#3" };
-Note A3{ 36, "A3" };
-Note ASharp3{ 37, "A#3" };
-Note B3{ 38, "B3" };
-Note C4{ 39, "C4" };
-Note CSharp4{ 40, "C#4" };
-Note D4{ 41, "D4" };
-Note DSharp4{ 42, "D#4" };
-Note E4{ 43, "E4" };
-Note F4{ 44, "F4" };
-Note FSharp4{ 45, "F#4" };
-Note G4{ 46, "G4" };
-Note GSharp4{ 47, "G#4" };
-Note A4{ 48, "A4" };
-Note ASharp4{ 49, "A#4" };
-Note B4{ 50, "B4" };
-Note C5{ 51, "C5" };
-Note CSharp5{ 52, "C#5" };
-Note D5{ 53, "D5" };
-Note DSharp5{ 54, "D#5" };
-Note E5{ 55, "E5" };
-Note F5{ 56, "F5" };
-Note FSharp5{ 57, "F#5" };
-Note G5{ 58, "G5" };
-Note GSharp5{ 59, "G#5" };
-Note A5{ 60, "A5" };
-Note ASharp5{ 61, "A#5" };
-Note B5{ 62, "B5" };
-Note C6{ 63, "C6" };
-Note CSharp6{ 64, "C#6" };
-Note D6{ 65, "D6" };
-Note DSharp6{ 66, "D#6" };
-Note E6{ 67, "E6" };
-Note F6{ 68, "F6" };
-Note FSharp6{ 69, "F#6" };
-Note G6{ 70, "G6" };
-Note GSharp6{ 71, "G#6" };
-Note A6{ 72, "A6" };
-Note ASharp6{ 73, "A#6" };
-Note B6{ 74, "B6" };
-Note C7{ 75, "C7" };
-Note CSharp7{ 76, "C#7" };
-Note D7{ 77, "D7" };
-Note DSharp7{ 78, "D#7" };
-Note E7{ 79, "E7" };
-Note F7{ 80, "F7" };
-Note FSharp7{ 81, "F#7" };
-Note G7{ 82, "G7" };
-Note GSharp7{ 83, "G#7" };
-Note A7{ 84, "A7" };
-Note ASharp7{ 85, "A#7" };
-Note B7{ 86, "B7" };
-Note C8{ 87, "C8" };
+Note C0{ 0, "C0" };
+Note CSharp0{ 1, "C#0" };
+Note D0{ 2, "D0" };
+Note DSharp0{ 3, "D#0" };
+Note E0{ 4, "E0" };
+Note F0{ 5, "F0" };
+Note FSharp0{ 6, "F#0" };
+Note G0{ 7, "G0" };
+Note GSharp0{ 8, "G#0" };
+Note A1{ 9, "A1" };
+Note ASharp1{ 10, "A#1" };
+Note B1{ 11, "B1" };
+Note C1{ 12, "C1" };
+Note CSharp1{ 13, "C#1" };
+Note D1{ 14, "D1" };
+Note DSharp1{ 15, "D#1" };
+Note E1{ 16, "E1" };
+Note F1{ 17, "F1" };
+Note FSharp1{ 18, "F#1" };
+Note G1{ 19, "G1" };
+Note GSharp1{ 20, "G#1" };
+Note A2{ 21, "A2" };
+Note ASharp2{ 22, "A#2" };
+Note B2{ 23, "B2" };
+Note C2{ 24, "C2" };
+Note CSharp2{ 25, "C#2" };
+Note D2{ 26, "D2" };
+Note DSharp2{ 27, "D#2" };
+Note E2{ 28, "E2" };
+Note F2{ 29, "F2" };
+Note FSharp2{ 30, "F#2" };
+Note G2{ 31, "G2" };
+Note GSharp2{ 32, "G#2" };
+Note A3{ 33, "A3" };
+Note ASharp3{ 34, "A#3" };
+Note B3{ 35, "B3" };
+Note C3{ 36, "C3" };
+Note CSharp3{ 37, "C#3" };
+Note D3{ 38, "D3" };
+Note DSharp3{ 39, "D#3" };
+Note E3{ 40, "E3" };
+Note F3{ 41, "F3" };
+Note FSharp3{ 42, "F#3" };
+Note G3{ 43, "G3" };
+Note GSharp3{ 44, "G#3" };
+Note A4{ 45, "A4" };
+Note ASharp4{ 46, "A#4" };
+Note B4{ 47, "B4" };
+Note C4{ 48, "C4" };
+Note CSharp4{ 49, "C#4" };
+Note D4{ 50, "D4" };
+Note DSharp4{ 51, "D#4" };
+Note E4{ 52, "E4" };
+Note F4{ 53, "F4" };
+Note FSharp4{ 54, "F#4" };
+Note G4{ 55, "G4" };
+Note GSharp4{ 56, "G#4" };
+Note A5{ 57, "A5" };
+Note ASharp5{ 58, "A#5" };
+Note B5{ 59, "B5" };
+Note C5{ 60, "C5" };
+Note CSharp5{ 61, "C#5" };
+Note D5{ 62, "D5" };
+Note DSharp5{ 63, "D#5" };
+Note E5{ 64, "E5" };
+Note F5{ 65, "F5" };
+Note FSharp5{ 66, "F#5" };
+Note G5{ 67, "G5" };
+Note GSharp5{ 68, "G#5" };
+Note A6{ 69, "A6" };
+Note ASharp6{ 70, "A#6" };
+Note B6{ 71, "B6" };
+Note C6{ 72, "C6" };
+Note CSharp6{ 73, "C#6" };
+Note D6{ 74, "D6" };
+Note DSharp6{ 75, "D#6" };
+Note E6{ 76, "E6" };
+Note F6{ 77, "F6" };
+Note FSharp6{ 78, "F#6" };
+Note G6{ 79, "G6" };
+Note GSharp6{ 80, "G#6" };
+Note A7{ 81, "A7" };
+Note ASharp7{ 82, "A#7" };
+Note B7{ 83, "B7" };
+Note C7{ 84, "C7" };
+Note CSharp7{ 85, "C#7" };
+Note D7{ 86, "D7" };
+Note DSharp7{ 87, "D#7" };
+Note E7{ 88, "E7" };
+Note F7{ 89, "F7" };
+Note FSharp7{ 90, "F#7" };
+Note G7{ 91, "G7" };
+Note GSharp7{ 92, "G#7" };
+Note A8{ 93, "A8" };
+Note ASharp8{ 94, "A#8" };
+Note B8{ 95, "B8" };
+Note C8{ 96, "C8" };
+Note CSharp8{ 97, "C#8" };
+Note D8{ 98, "D8" };
+Note DSharp8{ 99, "D#8" };
+Note E8{ 100, "E8" };
+Note F8{ 101, "F8" };
+Note FSharp8{ 102, "F#8" };
+Note G8{ 103, "G8" };
+Note GSharp8{ 104, "G#8" };
+Note A9{ 105, "A9" };
+Note ASharp9{ 106, "A#9" };
+Note B9{ 107, "B9" };
+Note C9{ 108, "C9" };
+Note CSharp9{ 109, "C#9" };
+Note D9{ 110, "D9" };
+Note DSharp9{ 111, "D#9" };
+Note E9{ 112, "E9" };
+Note F9{ 113, "F9" };
+Note FSharp9{ 114, "F#9" };
+Note G9{ 115, "G9" };
+Note GSharp9{ 116, "G#9" };
+Note A10{ 117, "A10" };
+Note ASharp10{ 118, "A#10" };
+Note B10{ 119, "B10" };
+Note C10{ 120, "C10" };
+Note CSharp10{ 121, "C#10" };
+Note D10{ 122, "D10" };
+Note DSharp10{ 123, "D#10" };
+Note E10{ 124, "E10" };
+Note F10{ 125, "F10" };
+Note FSharp10{ 126, "F#10" };
+Note G10{ 127, "G10" };
 
 std::set<Note*> sustained_notes {};
-
-void playNote(Note*)
-{
-	return;
-}
 
 // NOTE(aaron.meaney): This will essentially be the keymapper, it is hard coded at the moment
 Note* stringToNote(std::string character)
@@ -524,15 +577,104 @@ Note* stringToNote(std::string character)
 	if (character == "G") { note = &FSharp3; }
 	if (character == "B") { note = &G3; }
 	if (character == "H") { note = &GSharp3; }
-	if (character == "N") { note = &A3; }
-	if (character == "J") { note = &ASharp3; }
-	if (character == "M") { note = &B3; }
+	if (character == "N") { note = &A4; }
+	if (character == "J") { note = &ASharp4; }
+	if (character == "M") { note = &B4; }
 
 	if (note == nullptr) {
 		return nullptr;
 	}
 
 	return note;
+}
+
+#define MIDI_STATUS_NOTE_ON 0x90
+#define MIDI_STATUS_NOTE_OFF 0x80
+
+void sendMidiMessage(DWORD message)
+{
+	MMRESULT response = midiOutShortMsg(MIDI_PIANO.midiOutHandle, message);
+
+	if (response != MMSYSERR_NOERROR)
+	{
+		std::wstringstream ss;
+		ss << L"Could not send message to MIDI device\n";
+		ss << L"Error code: " << std::to_wstring(response) << std::endl;
+
+		OutputDebugString(ss.str().c_str());
+		MessageBox(MIDI_PIANO.windowHandle, ss.str().c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
+		exit(1);
+	}
+}
+
+void playNote(Note* note)
+{
+	union {
+		DWORD word;
+		BYTE bytes[4];
+	} midiMessage;
+
+	midiMessage.bytes[0] = MIDI_STATUS_NOTE_ON;
+	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[2] = 127;
+	midiMessage.bytes[3] = 0;
+
+	sendMidiMessage(midiMessage.word);
+}
+
+void stopNote(Note* note)
+{
+	union {
+		DWORD word;
+		BYTE bytes[4];
+	} midiMessage;
+
+	midiMessage.bytes[0] = MIDI_STATUS_NOTE_OFF;
+	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[2] = 127;
+	midiMessage.bytes[3] = 0;
+
+	sendMidiMessage(midiMessage.word);
+}
+
+void onKeyDown(LPCSTR character)
+{
+	Note* note = stringToNote(character);
+
+	if (note != nullptr)
+	{
+		if (sustained_notes.find(note) != sustained_notes.end())
+		{
+			return;
+		}
+
+		sustained_notes.insert(note);
+
+		if (MIDI_PIANO.midiOutHandle != NULL)
+		{
+			playNote(note);
+		}
+	}
+}
+
+void onKeyUp(LPCSTR character)
+{
+	Note* note = stringToNote(character);
+
+	if (note != nullptr)
+	{
+		if (sustained_notes.find(note) == sustained_notes.end())
+		{
+			return;
+		}
+
+		sustained_notes.erase(note);
+
+		if (MIDI_PIANO.midiOutHandle != NULL)
+		{
+			stopNote(note);
+		}
+	}
 }
 
 LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam)
@@ -587,13 +729,9 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		case WM_KEYDOWN:
 		{
 			LPCSTR character = (LPCSTR)&wParam;
-			Note* note = stringToNote(character);
 
-			if (note != nullptr)
-			{
-				sustained_notes.insert(note);
-			}
-
+			onKeyDown(character);
+			
 			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
 
 			break;
@@ -601,12 +739,8 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		case WM_KEYUP:
 		{
 			LPCSTR character = (LPCSTR)&wParam;
-			Note* note = stringToNote(character);
 
-			if (note != nullptr)
-			{
-				sustained_notes.erase(note);
-			}
+			onKeyUp(character);
 
 			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
 
@@ -669,7 +803,9 @@ void loadMidi(HWND windowHandle)
 
 	MIDIOUTCAPS midiOutCaps = {};
 	bool found = false;
+	int midiDeviceId = 0;
 
+	// This should be made into its own function like findWindowsMidiDevice
 	for (unsigned int midiDeviceIndex = 0; midiDeviceIndex < midiDeviceCount; midiDeviceIndex++)
 	{
 		midiOutGetDevCaps(midiDeviceIndex, &midiOutCaps, sizeof(midiOutCaps));
@@ -698,6 +834,7 @@ void loadMidi(HWND windowHandle)
 		if (midiOutCaps.wPid == MM_MSFT_GENERIC_MIDISYNTH && midiOutCaps.wTechnology == MOD_SWSYNTH)
 		{
 			found = true;
+			midiDeviceId = midiDeviceIndex;
 			break;
 		}
 	}
@@ -705,9 +842,25 @@ void loadMidi(HWND windowHandle)
 	if (!found)
 	{
 		OutputDebugString(L"Could not find valid MIDI Output Device");
-		MessageBox(windowHandle, L"Could not find valid MIDI Output Device.\nThis program will now exit.", L"FATAL ERROR", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox(windowHandle, L"Could not find valid MIDI Output Device.\nThis program will now exit.", L"FATAL ERROR", MB_OK | MB_ICONERROR);
 		exit(1);
 	}
+
+	HMIDIOUT midiOutHandle = {};
+	MMRESULT midiOpenResult = midiOutOpen(&midiOutHandle, midiDeviceId, NULL, NULL, CALLBACK_NULL); // Change NULL to MidiOutProc later
+
+	if (midiOpenResult != MMSYSERR_NOERROR)
+	{
+		ss.str(L"");
+		ss << L"Could not open MIDI device \n";
+		ss << L"Error code: " << std::to_wstring(midiOpenResult) << std::endl;
+
+		OutputDebugString(ss.str().c_str());
+		MessageBox(windowHandle, ss.str().c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
+		exit(1);
+	}
+
+	MIDI_PIANO.midiOutHandle = midiOutHandle;
 }
 
 int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, _In_ int)
@@ -727,11 +880,16 @@ int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, 
 		OutputDebugString(L"Failed to acquire a window handle\n");
 		return -1;
 	}
+	MIDI_PIANO.windowHandle = windowHandle;
 	OutputDebugString(L"Window handle acquired\n");
 
 	loadMidi(windowHandle);
 
+	OutputDebugString(L"Midi handle acquired\n");
+
 	ShowWindow(windowHandle, SW_SHOW);
+
+	OutputDebugString(L"Window displayed\n");
 	
 	runLoop();
 
