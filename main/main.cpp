@@ -1,7 +1,12 @@
+// PSC - Platform Specific Code, move to Win32/64 module
+// ASC - App Specific Code, move to app logic core module
 #ifndef UNICODE
 #define UNICODE
 #endif
 
+// Might try to find a way to remove pragma warning - low priority, spend 5 mins on it
+// Also organize the include headers into a specific standard
+// E.g. platform headers, third party headers, std headers, app headers
 #pragma warning(push)
 #pragma warning(disable: 4244)
 #include <windows.h>
@@ -19,9 +24,13 @@
 #include "glad.h"
 #pragma warning(pop)
 
+// ASC - Move to a file like code_defines.h
+// Also add types for uint32, uint64, ulong32, ulong64, etc...
+// Maybe also byte and word could be handy
 #define global static
 #define internal static
 
+// PSC - Refactor this to try and remove any global references
 global struct MIDI_PIANO {
 	HINSTANCE appInstance;
 	HGLRC openGlRenderingContext;
@@ -29,9 +38,12 @@ global struct MIDI_PIANO {
 	HMIDIOUT midiOutHandle;
 } MIDI_PIANO;
 
+// ASC - Add a way to create a window generically
+// Also move these down to where they're used, should not be global
 global int globalWindowWidth = 400;
 global int globalWindowHeight = 300;
 
+// PSC - We should move OpenGL code to the platform specific layer for the moment
 internal bool loadWithLoadGLLoader()
 {
 	if (!gladLoadGLLoader((GLADloadproc)wglGetProcAddress))
@@ -56,6 +68,7 @@ internal bool loadWithGladLoadGL()
 	return true;
 }
 
+// Might investiaget difference between these two loaders again later
 internal int loadGL()
 {
 	if (loadWithGladLoadGL())
@@ -68,12 +81,18 @@ internal int loadGL()
 		return true;
 	}
 
+	// Exception
 	return false;
 }
 
+// Win32OpenGlContext object?
 internal bool initOpenGl(HWND windowHandle)
 {
+	// Logger
 	OutputDebugString(L"Initializing OpenGL context\n");
+
+	// func buildPixelFormatDescriptor
+	// Inside func, also describe each param and why it is that value
 	PIXELFORMATDESCRIPTOR pixelFormatDescriptor =
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),
@@ -94,6 +113,8 @@ internal bool initOpenGl(HWND windowHandle)
 		0, 0, 0
 	};
 
+	// Might have the device context as part of the Win32Window object, can get it there instead of calling Win32 API?
+	// Although we do release it later - might investigate exactlty what a DC is and if we can just have one for the entire window at all times?
 	HDC deviceContext = GetDC(windowHandle);
 
 	int pixelFormat = ChoosePixelFormat(deviceContext, &pixelFormatDescriptor);
@@ -102,32 +123,43 @@ internal bool initOpenGl(HWND windowHandle)
 	HGLRC openGlRenderingContext = wglCreateContext(deviceContext);
 	if (openGlRenderingContext == NULL)
 	{
+		// Logger
 		OutputDebugString(L"Failed to create OpenGL context\n");
+
+		// Exception
 		return false;
 	}
 	OutputDebugString(L"OpenGL context created\n");
 
 	if (wglMakeCurrent(deviceContext, openGlRenderingContext) == FALSE)
 	{
+		// Logger
 		OutputDebugString(L"Failed to set OpenGL context\n");
+
+		// Exception
 		return false;
 	}
 	OutputDebugString(L"OpenGL context set\n");
 
+	// Exception should be raised if this doesn't load
 	if (!loadGL())
 	{
 		return false;
 	}
 
+	// begin func getOpenGlVersion() - make a cached getter?
 	int versionMajor;
 	int versionMinor;
 	glGetIntegerv(GL_MAJOR_VERSION, &versionMajor);
 	glGetIntegerv(GL_MINOR_VERSION, &versionMinor);
+	// end func
 
+	// Logger
 	std::wstringstream wss;
 	wss << L"Successfully initialized OpenGL v" << versionMajor << L"." << versionMinor << L"" << std::endl;
 	OutputDebugStringW(wss.str().c_str());
 
+	// Win32Window.SetOpenGlRenderingContext(...)
 	MIDI_PIANO.openGlRenderingContext = openGlRenderingContext;
 
 	glViewport(0, 0, globalWindowHeight, globalWindowWidth);
@@ -137,27 +169,39 @@ internal bool initOpenGl(HWND windowHandle)
 	return true;
 }
 
+// PSC - Code to center the window
 internal void centerWindow(HWND windowHandle)
 {
+	// Win32Window.screen.width
 	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+
+	// Win32Window.screen.height
 	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	RECT windowRect = {};
 	GetWindowRect(windowHandle, &windowRect);
 
+	// Win32Window.window.width
 	int windowWidth = windowRect.right - windowRect.left;
+	// Win32Window.window.height
 	int windowHeight = windowRect.bottom - windowRect.top;
 
+	// Win32Window.setPosition(...)
 	SetWindowPos(windowHandle, NULL, screenWidth / 2 - windowWidth, screenHeight / 2 - windowHeight, 0, 0, SWP_SHOWWINDOW);
 }
 
+// PSC - Code to create the window
 internal HWND createWindow(WNDCLASS windowClass)
 {
+	// Raise exception here if register fails
 	if (!RegisterClass(&windowClass))
 	{
 		return NULL;
 	}
 
+	// Use constants for everything here, move to buildWindowHandle function
+	// Go through each field and add comment for why we picked each
+	// Alternatively pass functions into each field with declarative name
 	HWND windowHandle = CreateWindowW(
 		windowClass.lpszClassName,
 		L"MIDI Piano",
@@ -172,8 +216,10 @@ internal HWND createWindow(WNDCLASS windowClass)
 		NULL
 	);
 
+	// Win32Window.center()
 	centerWindow(windowHandle);
 
+	// Raise exception here
 	if (!windowHandle) {
 		return NULL;
 	}
@@ -181,8 +227,10 @@ internal HWND createWindow(WNDCLASS windowClass)
 	return windowHandle;
 }
 
+// PSC - Win32RunMessageLoop
 internal void runLoop()
 {
+	// Logger
 	OutputDebugString(L"Running Message Loop\n");
 
 	MSG message = {};
@@ -193,12 +241,14 @@ internal void runLoop()
 	}
 }
 
+// PSC - Globals, move to win32_code_defines.h ?
 global HDC wtDeviceContext = 0;
 global RECT* wtRectangle = 0;
 global int wtLeftPadding = 0;
 global int wtTopPadding = 0;
 global int wtTopStep = 20;
 
+// DEL - We don't need this for the current feature
 void initWriteText(HDC deviceContext, RECT* rectangle, int leftPadding)
 {
 	wtDeviceContext = deviceContext;
@@ -207,21 +257,24 @@ void initWriteText(HDC deviceContext, RECT* rectangle, int leftPadding)
 	wtTopPadding = 0;
 }
 
+// DEL - We don't need this for the current feature
 void writeText(std::wstring string)
 {
 	ExtTextOut(wtDeviceContext, wtLeftPadding, wtTopPadding + wtTopStep, ETO_OPAQUE, wtRectangle, string.c_str(), (UINT)string.size(), NULL);
 	wtTopPadding += wtTopStep;
 }
 
+// DEL - We don't need this for the current feature
 void writeBlank()
 {
 	writeText(L"");
 }
 
+// PSC - Windows driver info - move to win32_driver_info.h ?
 struct ManufacturerIdentity
 {
 	WORD id;
-	const char name[64];
+	const char name[64]; // Reconsider having the string be in the stack, might be better to have it on the heap?
 };
 
 struct ManufacturerIdentity MANUFACTURER_IDENTITIES[] =
@@ -319,7 +372,7 @@ std::string manufacturerName(WORD id)
 struct ProductIdentity
 {
 	WORD id;
-	const char name[64];
+	const char name[64]; // Reconsider having the string be in the stack, might be better to have it on the heap?
 };
 
 struct ProductIdentity PRODUCT_IDENTITIES[] = {
@@ -381,6 +434,7 @@ std::string productName(WORD id)
 
 std::string getDriverVersion(MMVERSION version)
 {
+	// Create inline function to get high and low words?
 	int minor = version & 0xFF;
 	int major = version >> 8;
 	
@@ -408,6 +462,7 @@ struct Technology TECHNOLOGIES[] = {
 
 const char UNKNOWN_TECHNOLOGY[] = "Unknown Technology";
 
+// Should be a better way to write this
 std::string getTechnology(WORD technology)
 {
 	size_t arr_size = sizeof(TECHNOLOGIES) / sizeof(TECHNOLOGIES[0]);
@@ -423,6 +478,10 @@ std::string getTechnology(WORD technology)
 	return UNKNOWN_TECHNOLOGY;
 }
 
+// ASC - Move to midi.h ?
+// Also consider changing this to array or other data structure
+// Don't know if it'll ever be relevant to directory access a note by the name
+// Could just add a mapping function?
 struct Note
 {
 	byte id;
@@ -558,8 +617,10 @@ Note F10{ 125, "F10" };
 Note FSharp10{ 126, "F#10" };
 Note G10{ 127, "G10" };
 
+// Remove sustained notes
 std::set<Note*> sustained_notes {};
 
+// ASC - Make sure the PSC sends in generic info to this function, so it can be handled by other platforms - define interface
 // NOTE(aaron.meaney): This will essentially be the keymapper, it is hard coded at the moment
 Note* stringToNote(std::string character)
 {
@@ -588,9 +649,11 @@ Note* stringToNote(std::string character)
 	return note;
 }
 
+// ASC - Move this also to app code layer
 #define MIDI_STATUS_NOTE_ON 0x90
 #define MIDI_STATUS_NOTE_OFF 0x80
 
+// PSC - May need to be refactored too
 void sendMidiMessage(DWORD message)
 {
 	MMRESULT response = midiOutShortMsg(MIDI_PIANO.midiOutHandle, message);
@@ -607,8 +670,10 @@ void sendMidiMessage(DWORD message)
 	}
 }
 
+// PSC - Should make this win32 play MIDI?
 void playNote(Note* note)
 {
+	// Keep this :D
 	union {
 		DWORD word;
 		BYTE bytes[4];
@@ -619,11 +684,17 @@ void playNote(Note* note)
 	midiMessage.bytes[2] = 127;
 	midiMessage.bytes[3] = 0;
 
+	// Consider using a MIDI Stream instead?
+	// Slight latency with current method
+	// https://docs.microsoft.com/en-us/windows/win32/multimedia/managing-midi-data-blocks
+	// Might need to use a double buffer and use it this way to prevent the audio latency
 	sendMidiMessage(midiMessage.word);
 }
 
+// PSC - Should make this win32 stop MIDI?
 void stopNote(Note* note)
 {
+	// Keep this :D
 	union {
 		DWORD word;
 		BYTE bytes[4];
@@ -637,12 +708,15 @@ void stopNote(Note* note)
 	sendMidiMessage(midiMessage.word);
 }
 
+// PSC
 void onKeyDown(LPCSTR character)
 {
 	Note* note = stringToNote(character);
 
+	// Change to a guard statement
 	if (note != nullptr)
 	{
+		// Remove sustained notes code
 		if (sustained_notes.find(note) != sustained_notes.end())
 		{
 			return;
@@ -657,12 +731,15 @@ void onKeyDown(LPCSTR character)
 	}
 }
 
+// PSC
 void onKeyUp(LPCSTR character)
 {
 	Note* note = stringToNote(character);
 
+	// Change to a guard statement
 	if (note != nullptr)
 	{
+		// Remove sustained notes code
 		if (sustained_notes.find(note) == sustained_notes.end())
 		{
 			return;
@@ -677,15 +754,23 @@ void onKeyUp(LPCSTR character)
 	}
 }
 
+// PSC - Send to win32 main?
+// Should also make smaller functions in each case statement - inline?
 LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	LRESULT result = 0;
 
+	// Create a dispatchMessage function - maybe there's a design pattern for this?
+	// return dispatchMessage(windowHandle, message... etc
 	switch (message) {
 		case WM_CREATE:
 		{
+			// func Win32CallbackCreate
+
+			// Logger
 			OutputDebugString(L"WM_CREATE\n");
 
+			// Exception should be raised here
 			if (!initOpenGl(windowHandle))
 			{
 				return -1;
@@ -695,6 +780,7 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		}
 		case WM_PAINT:
 		{
+			// func Win32CallbackPaint
 			OutputDebugString(L"WM_PAINT\n");
 
 			// This is all temporary drawing code until I implement a proper GUI system
@@ -705,6 +791,7 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 
 			SetBkMode(deviceContext, TRANSPARENT);
 
+			// Remove text code, implement it properly at a later date
 			initWriteText(deviceContext, &rectangle, 10);
 			writeText(L"MIDI Piano");
 			writeText(L"Version 0.0.1 ALPHA");
@@ -728,37 +815,53 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		}
 		case WM_KEYDOWN:
 		{
+			// func Win32CallbackKeydown
 			LPCSTR character = (LPCSTR)&wParam;
 
+			// Win32Window.emitEvent(KEY_DOWN, character)
+			// Might need to create an event system?
+			// The emit methods should be private, so no outside code can emit events
 			onKeyDown(character);
 			
+			// Win32Window.redraw - private method
 			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
 
 			break;
 		}
 		case WM_KEYUP:
 		{
+			// func Win32CallbackKeyup
 			LPCSTR character = (LPCSTR)&wParam;
 
+			// Win32Window.emitEvent(KEY_UP, character)
 			onKeyUp(character);
 
+			// Win32Window.redraw - private method
 			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
 
 			break;
 		}
 		case WM_CLOSE:
 		{
+			// func Win32CallbackClose
 			PostQuitMessage(0);
 			break;
 		}
 		case WM_SIZE:
 		{
+			// func Win32CallbackSize
+
+			// Logger
 			OutputDebugString(L"WM_SIZE\n");
 
+			// iirc this was temp code so we wouldn't handle it until the window was initialized
+			// Maybe add a guard statement to start of the message handler for
+			// return unless windowInitialized?
 			if (MIDI_PIANO.openGlRenderingContext == NULL) {
 				break;
 			}
 
+			// Yeah move this to another private func
 			INT width = LOWORD(lParam);
 			INT height = HIWORD(lParam);
 
@@ -768,7 +871,12 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		}
 		case WM_GETMINMAXINFO:
 		{
+			// func Win32CallbackGetMinMaxInfo
 			LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
+
+			// Move those globals to here
+			// Will be changed again soon for variable window height, but don't worry about that now
+			// Just move all the logic here so it is easy to change once we get there
 			minMaxInfo->ptMinTrackSize.x = globalWindowWidth;
 			minMaxInfo->ptMinTrackSize.y = globalWindowHeight;
 
@@ -779,6 +887,7 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 		}
 		default:
 		{
+			// no func needed here, or maybe just remove default have have return DefWindowProc?
 			result = DefWindowProc(windowHandle, message, wParam, lParam);
 		}
 	}
@@ -786,36 +895,46 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 	return result;
 }
 
+//PSC - Send to Win32 Main
+// Should break a lot of this into smaller functions
+// Could also make it an object? 
+// Win32GenericMidi
 void loadMidi(HWND windowHandle)
 {
+	// begin func getMidiDeviceCount?
 	unsigned int midiDeviceCount = midiOutGetNumDevs();
 
 	std::wstringstream ss;
 	ss << L"Number of MIDI output devices: " << midiDeviceCount << "\n\n";
 
 	OutputDebugString(ss.str().c_str());
+	// end func getMidiDeviceCount
 
+	// Raise exception here NoMidiDevicesFound?
 	if (midiDeviceCount == 0) {
 		return;
 	}
 
 	ss.str(L"");
 
-	MIDIOUTCAPS midiOutCaps = {};
-	bool found = false;
-	int midiDeviceId = 0;
+	// begin func findWindowsMidiDevice?
+	MIDIOUTCAPS midiOutCaps = {}; // wtf is MIDIOUTCAPS again? :/
+	bool found = false; // lol, remove this once it is a function
+	int midiDeviceId = 0; // also lol
 
 	// This should be made into its own function like findWindowsMidiDevice
 	for (unsigned int midiDeviceIndex = 0; midiDeviceIndex < midiDeviceCount; midiDeviceIndex++)
 	{
 		midiOutGetDevCaps(midiDeviceIndex, &midiOutCaps, sizeof(midiOutCaps));
 
+		// Same here, move this into a log builder or something
 		std::string manufacturer = manufacturerName(midiOutCaps.wMid);
 		std::string product = productName(midiOutCaps.wPid);
 		std::string driverVersion = getDriverVersion(midiOutCaps.vDriverVersion);
 		std::wstring productName = midiOutCaps.szPname;
 		std::string technology = getTechnology(midiOutCaps.wTechnology);
 
+		// This should be moved into like a print function or something
 		ss << L"==========\nFound device " << std::to_wstring(midiDeviceIndex + 1) << L" of " << std::to_wstring(midiDeviceCount) << "\n";
 		ss << "Manufacturer: " << manufacturer.c_str() << "\n";
 		ss << "Product: " << product.c_str() << "\n";
@@ -827,10 +946,12 @@ void loadMidi(HWND windowHandle)
 		ss << "Support: " << midiOutCaps.dwSupport << "\n";
 		ss << std::endl;
 
+		// Logger
 		OutputDebugString(ss.str().c_str());
 
 		ss.clear();
 
+		// new func isMidiDeviceWindowsGeneric
 		if (midiOutCaps.wPid == MM_MSFT_GENERIC_MIDISYNTH && midiOutCaps.wTechnology == MOD_SWSYNTH)
 		{
 			found = true;
@@ -839,60 +960,100 @@ void loadMidi(HWND windowHandle)
 		}
 	}
 
+	// raise exception MidiDeviceNotFound
 	if (!found)
 	{
+		// Logger
 		OutputDebugString(L"Could not find valid MIDI Output Device");
+
+		// Make a diaog box class?
+		// win32Dialog.show(L"Could not find...")
+		// also make them constant vars?
 		MessageBox(windowHandle, L"Could not find valid MIDI Output Device.\nThis program will now exit.", L"FATAL ERROR", MB_OK | MB_ICONERROR);
 		exit(1);
 	}
+	// end func
 
+	// begin func openMidiDevice
 	HMIDIOUT midiOutHandle = {};
-	MMRESULT midiOpenResult = midiOutOpen(&midiOutHandle, midiDeviceId, NULL, NULL, CALLBACK_NULL); // Change NULL to MidiOutProc later
+	MMRESULT midiOpenResult = midiOutOpen(&midiOutHandle, midiDeviceId, NULL, NULL, CALLBACK_NULL); // Change NULL to MidiOutProc later - is this needed?
 
+	// 
 	if (midiOpenResult != MMSYSERR_NOERROR)
 	{
+		// func raiseMidiDeviceException ?
 		ss.str(L"");
 		ss << L"Could not open MIDI device \n";
 		ss << L"Error code: " << std::to_wstring(midiOpenResult) << std::endl;
 
+		// Logger
 		OutputDebugString(ss.str().c_str());
+		// Dialog box
 		MessageBox(windowHandle, ss.str().c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
+		
+		// Should exit be handled by a singleton class?
+		// E.g. MIDI_PIANO_FATAL();
 		exit(1);
 	}
 
 	MIDI_PIANO.midiOutHandle = midiOutHandle;
+	// end func openMidiDevice
 }
 
+// PSC - Win main
+// Move more of this logic into smaller functions
+// Could also have winMain just delegate to the app main
+// wWinMain() -> MIDIPiano::main()
 int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, _In_ int)
 {
 	MIDI_PIANO.appInstance = appInstance;
 
+	// func start - buildWindowClass
 	WNDCLASS windowClass = {};
 	windowClass.lpfnWndProc = MidiPianoMainWindowCallback;
 	windowClass.hInstance = appInstance;
-	windowClass.hbrBackground = (HBRUSH)(COLOR_BACKGROUND);
-	windowClass.lpszClassName = L"MidiPianoWindowClass";
-	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	windowClass.hbrBackground = (HBRUSH)(COLOR_BACKGROUND); // Make constant windowClassBackground - check online for what exactly this should be called
+	windowClass.lpszClassName = L"MidiPianoWindowClass"; // Make constant WindowClassName
+	windowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC; // Make constant WindowStyle, in comment explain why we picked each style
+	// func end
 
+	// PSC - All OutputDebugString calls should be wrapped in a logger class outside of platform code
 	OutputDebugString(L"Acquiring window handle...\n");
+
+	// PSC - Window creation logic should be wrapped in a generic platform OO layer
+	// Something like midiWindow.create() or windowFactory.platform(WIN_32).title('...') ???
 	HWND windowHandle = createWindow(windowClass);
+	
+	// Raise exception here instead of a null check
 	if (windowHandle == NULL) {
+		// Logger
 		OutputDebugString(L"Failed to acquire a window handle\n");
 		return -1;
 	}
+
+	// Try to remove globals, or at least put the windowHandle in a win32Window object/struct ?
 	MIDI_PIANO.windowHandle = windowHandle;
+	// Logger
 	OutputDebugString(L"Window handle acquired\n");
 
+	// Rename to initMidi?
+	// Could also have in private function inside the win32Window class?
 	loadMidi(windowHandle);
 
+	// Logger
 	OutputDebugString(L"Midi handle acquired\n");
 
+	// Show window should be handled by app logic intead?
+	// win32Window.show();
 	ShowWindow(windowHandle, SW_SHOW);
 
+	// Logger
 	OutputDebugString(L"Window displayed\n");
 	
+	// Rename to something like pollSystemMessages
 	runLoop();
 
+	// Put this in destructor?
 	PostQuitMessage(0);
 	return 0;
 }

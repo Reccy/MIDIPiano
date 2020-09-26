@@ -21,6 +21,7 @@ list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
 set(LIBRARY_DIR "core")
 set(LIBRARY_NAME "${PROJECT_NAME}Core")
 
+# TODO: Remove this overcomplicated way of adding libs by concatenating variables
 set(LIBRARY_HEADERS
 	"${LIBRARY_DIR}/${PROJECT_NAME_SNAKE_CASE}.h"
 )
