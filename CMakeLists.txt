@@ -17,7 +17,7 @@ list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
 #
 # Core Library Setup
 #
-set(CORE_LIBRARY_DIR "core")
+set(CORE_LIBRARY_DIR "src/core")
 set(CORE_LIBRARY_NAME "${PROJECT_NAME}Core")
 
 set(LIBRARY_HEADERS
@@ -34,7 +34,7 @@ target_compile_options("${CORE_LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 #
 # Third Party Library Setup
 #
-set(COMMON_THIRD_PARTY_LIBS_DIR "lib/common")
+set(COMMON_THIRD_PARTY_LIBS_DIR "src/lib/commonlibs")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
@@ -46,19 +46,22 @@ list(APPEND COMMON_THIRD_PARTY_LIBS "glad")
 #
 # Win32 Third Party Library Setup
 #
-set(WIN32_THIRD_PARTY_LIBS_DIR "lib/win32")
+set(WIN32_THIRD_PARTY_LIBS_DIR "src/lib/win32libs")
 
 list(APPEND WIN32_THIRD_PARTY_LIBS "winmm.lib")
+
+add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_driver_info")
+list(APPEND WIN32_THIRD_PARTY_LIBS "win32_driver_info")
 
 #
 # Test Suite Setup
 #
 include("cmake/SetupGoogleTest.cmake")
-set(TEST_SUITE_DIR "test")
+set(TEST_SUITE_DIR "src/test")
 set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
-	"test/core/midi_piano_test.cpp")
+	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
 target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${CORE_LIBRARY_NAME}")
@@ -70,7 +73,7 @@ add_test(NAME "${TEST_RUNNER_EXECUTABLE_NAME}" COMMAND "${TEST_RUNNER_EXECUTABLE
 #
 # Executable Setup
 #
-set(EXECUTABLE_DIR "main")
+set(EXECUTABLE_DIR "src/main")
 set(EXECUTABLE_NAME "${PROJECT_NAME}")
 
 list(APPEND INCLUDED_LIBS "${CORE_LIBRARY_NAME}")
