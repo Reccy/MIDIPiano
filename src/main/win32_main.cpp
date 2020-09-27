@@ -33,6 +33,14 @@ static struct MIDI_PIANO {
 static int globalWindowWidth = 300;
 static int globalWindowHeight = 100;
 
+struct OpenGlInitException : public std::exception
+{
+	const char* what() const throw()
+	{
+		return "OpenGlInitException";
+	}
+};
+
 // PSC - We should move OpenGL code to the platform specific layer for the moment
 static bool loadWithLoadGLLoader()
 {
@@ -97,14 +105,6 @@ void setPixelFormat(HDC deviceContext, PIXELFORMATDESCRIPTOR* pixelFormatDescrip
 	SetPixelFormat(deviceContext, pixelFormat, pixelFormatDescriptor);
 }
 
-struct OpenGlInitException : public std::exception
-{
-	const char* what() const throw()
-	{
-		return "OpenGlInitException";
-	}
-};
-
 HGLRC buildOpenGlRenderingContext(HDC deviceContext)
 {
 	HGLRC openGlRenderingContext = wglCreateContext(deviceContext);
@@ -162,7 +162,9 @@ static bool initOpenGl(HWND windowHandle)
 	catch (OpenGlInitException& e)
 	{
 		// Logger
-		OutputDebugString(L"Failed to create OpenGL context\n");
+		OutputDebugString(L"Failed to create OpenGL context:");
+		OutputDebugStringA(e.what());
+		OutputDebugString(L"\n");
 		throw(OpenGlInitException());
 	}
 
@@ -176,7 +178,9 @@ static bool initOpenGl(HWND windowHandle)
 	catch (OpenGlInitException& e)
 	{
 		// Logger
-		OutputDebugString(L"Failed to set OpenGL context\n");
+		OutputDebugString(L"Failed to set OpenGL context:");
+		OutputDebugStringA(e.what());
+		OutputDebugString(L"\n");
 		throw(OpenGlInitException());
 	}
 	
