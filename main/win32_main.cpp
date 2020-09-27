@@ -21,7 +21,7 @@
 #include <algorithm>
 #include <iostream>
 
-#include "glad.h"
+#include <glad.h>
 #pragma warning(pop)
 
 // ASC - Move to a file like code_defines.h
@@ -437,9 +437,9 @@ std::string getDriverVersion(MMVERSION version)
 	// Create inline function to get high and low words?
 	int minor = version & 0xFF;
 	int major = version >> 8;
-	
+
 	std::stringstream ss;
-	ss << "v" <<  major << "." << minor;
+	ss << "v" << major << "." << minor;
 
 	return ss.str();
 }
@@ -618,7 +618,7 @@ Note FSharp10{ 126, "F#10" };
 Note G10{ 127, "G10" };
 
 // Remove sustained notes
-std::set<Note*> sustained_notes {};
+std::set<Note*> sustained_notes{};
 
 // ASC - Make sure the PSC sends in generic info to this function, so it can be handled by other platforms - define interface
 // NOTE(aaron.meaney): This will essentially be the keymapper, it is hard coded at the moment
@@ -763,133 +763,133 @@ LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WP
 	// Create a dispatchMessage function - maybe there's a design pattern for this?
 	// return dispatchMessage(windowHandle, message... etc
 	switch (message) {
-		case WM_CREATE:
+	case WM_CREATE:
+	{
+		// func Win32CallbackCreate
+
+		// Logger
+		OutputDebugString(L"WM_CREATE\n");
+
+		// Exception should be raised here
+		if (!initOpenGl(windowHandle))
 		{
-			// func Win32CallbackCreate
+			return -1;
+		}
 
-			// Logger
-			OutputDebugString(L"WM_CREATE\n");
+		break;
+	}
+	case WM_PAINT:
+	{
+		// func Win32CallbackPaint
+		OutputDebugString(L"WM_PAINT\n");
 
-			// Exception should be raised here
-			if (!initOpenGl(windowHandle))
-			{
-				return -1;
-			}
+		// This is all temporary drawing code until I implement a proper GUI system
 
+		RECT rectangle = {};
+		PAINTSTRUCT paint = {};
+		HDC deviceContext = BeginPaint(windowHandle, &paint);
+
+		SetBkMode(deviceContext, TRANSPARENT);
+
+		// Remove text code, implement it properly at a later date
+		initWriteText(deviceContext, &rectangle, 10);
+		writeText(L"MIDI Piano");
+		writeText(L"Version 0.0.1 ALPHA");
+		writeBlank();
+		writeText(L"By Aaron Meaney");
+		writeText(L"13/09/2020");
+
+		std::wstringstream ss;
+
+		for (auto it = sustained_notes.begin(); it != sustained_notes.end(); ++it)
+		{
+			Note* note = *it;
+			ss << note->name;
+			ss << " ";
+		}
+
+		writeText(ss.str().c_str());
+
+		EndPaint(windowHandle, &paint);
+		break;
+	}
+	case WM_KEYDOWN:
+	{
+		// func Win32CallbackKeydown
+		LPCSTR character = (LPCSTR)&wParam;
+
+		// Win32Window.emitEvent(KEY_DOWN, character)
+		// Might need to create an event system?
+		// The emit methods should be private, so no outside code can emit events
+		onKeyDown(character);
+
+		// Win32Window.redraw - private method
+		RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
+
+		break;
+	}
+	case WM_KEYUP:
+	{
+		// func Win32CallbackKeyup
+		LPCSTR character = (LPCSTR)&wParam;
+
+		// Win32Window.emitEvent(KEY_UP, character)
+		onKeyUp(character);
+
+		// Win32Window.redraw - private method
+		RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
+
+		break;
+	}
+	case WM_CLOSE:
+	{
+		// func Win32CallbackClose
+		PostQuitMessage(0);
+		break;
+	}
+	case WM_SIZE:
+	{
+		// func Win32CallbackSize
+
+		// Logger
+		OutputDebugString(L"WM_SIZE\n");
+
+		// iirc this was temp code so we wouldn't handle it until the window was initialized
+		// Maybe add a guard statement to start of the message handler for
+		// return unless windowInitialized?
+		if (MIDI_PIANO.openGlRenderingContext == NULL) {
 			break;
 		}
-		case WM_PAINT:
-		{
-			// func Win32CallbackPaint
-			OutputDebugString(L"WM_PAINT\n");
 
-			// This is all temporary drawing code until I implement a proper GUI system
+		// Yeah move this to another private func
+		INT width = LOWORD(lParam);
+		INT height = HIWORD(lParam);
 
-			RECT rectangle = {};
-			PAINTSTRUCT paint = {};
-			HDC deviceContext = BeginPaint(windowHandle, &paint);
+		glViewport(0, 0, width, height);
 
-			SetBkMode(deviceContext, TRANSPARENT);
+		break;
+	}
+	case WM_GETMINMAXINFO:
+	{
+		// func Win32CallbackGetMinMaxInfo
+		LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
 
-			// Remove text code, implement it properly at a later date
-			initWriteText(deviceContext, &rectangle, 10);
-			writeText(L"MIDI Piano");
-			writeText(L"Version 0.0.1 ALPHA");
-			writeBlank();
-			writeText(L"By Aaron Meaney");
-			writeText(L"13/09/2020");
+		// Move those globals to here
+		// Will be changed again soon for variable window height, but don't worry about that now
+		// Just move all the logic here so it is easy to change once we get there
+		minMaxInfo->ptMinTrackSize.x = globalWindowWidth;
+		minMaxInfo->ptMinTrackSize.y = globalWindowHeight;
 
-			std::wstringstream ss;
+		minMaxInfo->ptMaxTrackSize.x = globalWindowWidth;
+		minMaxInfo->ptMaxTrackSize.y = globalWindowHeight;
 
-			for (auto it = sustained_notes.begin(); it != sustained_notes.end(); ++it)
-			{
-				Note* note = *it;
-				ss << note->name;
-				ss << " ";
-			}
-
-			writeText(ss.str().c_str());
-
-			EndPaint(windowHandle, &paint);
-			break;
-		}
-		case WM_KEYDOWN:
-		{
-			// func Win32CallbackKeydown
-			LPCSTR character = (LPCSTR)&wParam;
-
-			// Win32Window.emitEvent(KEY_DOWN, character)
-			// Might need to create an event system?
-			// The emit methods should be private, so no outside code can emit events
-			onKeyDown(character);
-			
-			// Win32Window.redraw - private method
-			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
-
-			break;
-		}
-		case WM_KEYUP:
-		{
-			// func Win32CallbackKeyup
-			LPCSTR character = (LPCSTR)&wParam;
-
-			// Win32Window.emitEvent(KEY_UP, character)
-			onKeyUp(character);
-
-			// Win32Window.redraw - private method
-			RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
-
-			break;
-		}
-		case WM_CLOSE:
-		{
-			// func Win32CallbackClose
-			PostQuitMessage(0);
-			break;
-		}
-		case WM_SIZE:
-		{
-			// func Win32CallbackSize
-
-			// Logger
-			OutputDebugString(L"WM_SIZE\n");
-
-			// iirc this was temp code so we wouldn't handle it until the window was initialized
-			// Maybe add a guard statement to start of the message handler for
-			// return unless windowInitialized?
-			if (MIDI_PIANO.openGlRenderingContext == NULL) {
-				break;
-			}
-
-			// Yeah move this to another private func
-			INT width = LOWORD(lParam);
-			INT height = HIWORD(lParam);
-
-			glViewport(0, 0, width, height);
-
-			break;
-		}
-		case WM_GETMINMAXINFO:
-		{
-			// func Win32CallbackGetMinMaxInfo
-			LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
-
-			// Move those globals to here
-			// Will be changed again soon for variable window height, but don't worry about that now
-			// Just move all the logic here so it is easy to change once we get there
-			minMaxInfo->ptMinTrackSize.x = globalWindowWidth;
-			minMaxInfo->ptMinTrackSize.y = globalWindowHeight;
-
-			minMaxInfo->ptMaxTrackSize.x = globalWindowWidth;
-			minMaxInfo->ptMaxTrackSize.y = globalWindowHeight;
-
-			break;
-		}
-		default:
-		{
-			// no func needed here, or maybe just remove default have have return DefWindowProc?
-			result = DefWindowProc(windowHandle, message, wParam, lParam);
-		}
+		break;
+	}
+	default:
+	{
+		// no func needed here, or maybe just remove default have have return DefWindowProc?
+		result = DefWindowProc(windowHandle, message, wParam, lParam);
+	}
 	}
 
 	return result;
@@ -990,7 +990,7 @@ void loadMidi(HWND windowHandle)
 		OutputDebugString(ss.str().c_str());
 		// Dialog box
 		MessageBox(windowHandle, ss.str().c_str(), L"FATAL ERROR", MB_OK | MB_ICONERROR);
-		
+
 		// Should exit be handled by a singleton class?
 		// E.g. MIDI_PIANO_FATAL();
 		exit(1);
@@ -1023,7 +1023,7 @@ int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, 
 	// PSC - Window creation logic should be wrapped in a generic platform OO layer
 	// Something like midiWindow.create() or windowFactory.platform(WIN_32).title('...') ???
 	HWND windowHandle = createWindow(windowClass);
-	
+
 	// Raise exception here instead of a null check
 	if (windowHandle == NULL) {
 		// Logger
@@ -1049,7 +1049,7 @@ int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, 
 
 	// Logger
 	OutputDebugString(L"Window displayed\n");
-	
+
 	// Rename to something like pollSystemMessages
 	runLoop();
 

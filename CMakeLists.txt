@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.15.0)
 
 set(PROJECT_NAME MidiPiano)
-set(PROJECT_NAME_SNAKE_CASE midi_piano)
 project("${PROJECT_NAME}" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -18,34 +17,38 @@ list(APPEND CUSTOM_COMPILE_FLAGS "/WX")		# Treat warnings as errors
 #
 # Core Library Setup
 #
-set(LIBRARY_DIR "core")
-set(LIBRARY_NAME "${PROJECT_NAME}Core")
+set(CORE_LIBRARY_DIR "core")
+set(CORE_LIBRARY_NAME "${PROJECT_NAME}Core")
 
-# TODO: Remove this overcomplicated way of adding libs by concatenating variables
 set(LIBRARY_HEADERS
-	"${LIBRARY_DIR}/${PROJECT_NAME_SNAKE_CASE}.h"
+	"${CORE_LIBRARY_DIR}/midi_piano.h"
 )
 
 set(LIBRARY_SOURCES
-	"${LIBRARY_DIR}/${PROJECT_NAME_SNAKE_CASE}.cpp"
+	"${CORE_LIBRARY_DIR}/midi_piano.cpp"
 )
 
-add_library("${LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
-target_compile_options("${LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
+add_library("${CORE_LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
+target_compile_options("${CORE_LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 #
 # Third Party Library Setup
 #
-set(THIRD_PARTY_LIBS_DIR "lib")
+set(COMMON_THIRD_PARTY_LIBS_DIR "lib/common")
 
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS})
-list(APPEND THIRD_PARTY_LIBS ${OPENGL_LIBRARIES})
+list(APPEND COMMON_THIRD_PARTY_LIBS ${OPENGL_LIBRARIES})
 
-add_subdirectory("${THIRD_PARTY_LIBS_DIR}/glad")
-list(APPEND THIRD_PARTY_LIBS "glad")
+add_subdirectory("${COMMON_THIRD_PARTY_LIBS_DIR}/glad")
+list(APPEND COMMON_THIRD_PARTY_LIBS "glad")
 
-list(APPEND THIRD_PARTY_LIBS "winmm.lib")
+#
+# Win32 Third Party Library Setup
+#
+set(WIN32_THIRD_PARTY_LIBS_DIR "lib/win32")
+
+list(APPEND WIN32_THIRD_PARTY_LIBS "winmm.lib")
 
 #
 # Test Suite Setup
@@ -55,10 +58,10 @@ set(TEST_SUITE_DIR "test")
 set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
-	"test/core/${PROJECT_NAME_SNAKE_CASE}_test.cpp")
+	"test/core/midi_piano_test.cpp")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
-target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
-target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${LIBRARY_NAME}")
+target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
+target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${CORE_LIBRARY_NAME}")
 target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 enable_testing()
@@ -70,11 +73,15 @@ add_test(NAME "${TEST_RUNNER_EXECUTABLE_NAME}" COMMAND "${TEST_RUNNER_EXECUTABLE
 set(EXECUTABLE_DIR "main")
 set(EXECUTABLE_NAME "${PROJECT_NAME}")
 
-set(EXECUTABLE_SOURCES
-	"${EXECUTABLE_DIR}/main.cpp"
-)
+list(APPEND INCLUDED_LIBS "${CORE_LIBRARY_NAME}")
+list(APPEND INCLUDED_LIBS "${COMMON_THIRD_PARTY_LIBS}")
 
-add_executable("${EXECUTABLE_NAME}" WIN32 "${EXECUTABLE_SOURCES}")
-target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${LIBRARY_DIR}")
-target_link_libraries("${EXECUTABLE_NAME}" "${LIBRARY_NAME}" "${THIRD_PARTY_LIBS}")
+if (WIN32)
+	add_executable("${EXECUTABLE_NAME}" WIN32 "${EXECUTABLE_DIR}/win32_main.cpp")
+
+	list(APPEND INCLUDED_LIBS "${WIN32_THIRD_PARTY_LIBS}")
+endif(WIN32)
+
+target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
+target_link_libraries("${EXECUTABLE_NAME}" "${INCLUDED_LIBS}")
 target_compile_options("${EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
