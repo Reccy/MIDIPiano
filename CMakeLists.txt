@@ -53,6 +53,9 @@ list(APPEND WIN32_THIRD_PARTY_LIBS "winmm.lib")
 add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_driver_info")
 list(APPEND WIN32_THIRD_PARTY_LIBS "win32_driver_info")
 
+add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_window")
+list(APPEND WIN32_THIRD_PARTY_LIBS "win32_window")
+
 #
 # Test Suite Setup
 #

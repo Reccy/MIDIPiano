@@ -11,6 +11,7 @@
 // Third Party Headers
 #include <glad.h>
 #include <win32_driver_info.h>
+#include <win32_window.h>
 
 // STD Headers
 #include <sstream>
@@ -202,89 +203,6 @@ static bool initOpenGl(HWND windowHandle)
 	glViewport(0, 0, globalWindowHeight, globalWindowWidth);
 
 	return true;
-}
-
-// window(private)->getInitialWindowPos.x
-int getInitialWindowPosX(int windowWidth)
-{
-	int screenWidth = GetSystemMetrics(SM_CXSCREEN);
-	return screenWidth / 2 - windowWidth;
-}
-
-// window(private)->getInitialWindowPos.y
-int getInitialWindowPosY(int windowHeight)
-{
-	int screenHeight = GetSystemMetrics(SM_CYSCREEN);
-	return screenHeight / 2 - windowHeight;
-}
-
-// Win32Window::CreateWindowException
-struct CreateWindowException : public std::exception
-{
-	const char* what() const throw()
-	{
-		return "CreateWindowException";
-	}
-};
-
-// Win32Window::getWindowStyle
-DWORD getWindowStyle()
-{
-	// WS_OVERLAPPED: Gives the window a title bar and a border
-	// WS_MINIMIZEBOX: Gives the window a minimize button
-	// WS_SYSMENU: Gives the window a menu for minimize and close buttons
-	return WS_OVERLAPPED | WS_MINIMIZEBOX | WS_SYSMENU;
-}
-
-HWND buildWindowHandle(WNDCLASS windowClass)
-{
-	LPCWSTR windowClassName = windowClass.lpszClassName;
-	LPCWSTR windowName = L"MIDI Piano";
-	DWORD windowStyle = getWindowStyle();
-	int initialPosX = getInitialWindowPosX(globalWindowWidth);
-	int initialPosY = getInitialWindowPosY(globalWindowHeight);
-	int initialWidth = globalWindowWidth;
-	int initialHeight = globalWindowHeight;
-	HWND windowParent = NULL;
-	HMENU menu = NULL;
-	HINSTANCE windowInstance = windowClass.hInstance;
-	LPVOID lParam = NULL;
-
-	HWND windowHandle = CreateWindowW(
-		windowClassName,
-		windowName,
-		windowStyle,
-		initialPosX,
-		initialPosY,
-		initialWidth,
-		initialHeight,
-		windowParent,
-		menu,
-		windowInstance,
-		lParam
-	);
-
-	MIDI_PIANO.windowHandle = windowHandle;
-
-	return windowHandle;
-}
-
-// PSC - Code to create the window
-// Win32Window::Win32Window -> Constructor
-static HWND createWindow(WNDCLASS windowClass)
-{
-	if (!RegisterClass(&windowClass))
-	{
-		throw CreateWindowException();
-	}
-
-	HWND windowHandle = buildWindowHandle(windowClass);
-
-	if (!windowHandle) {
-		throw CreateWindowException();
-	}
-
-	return windowHandle;
 }
 
 // PSC - Win32RunMessageLoop
@@ -652,92 +570,6 @@ void win32CallbackSize(LPARAM lParam)
 	glViewport(0, 0, width, height);
 }
 
-void win32CallbackGetMinMaxInfo(LPARAM lParam)
-{
-	LPMINMAXINFO minMaxInfo = (LPMINMAXINFO)lParam;
-
-	minMaxInfo->ptMinTrackSize.x = globalWindowWidth;
-	minMaxInfo->ptMinTrackSize.y = globalWindowHeight;
-
-	minMaxInfo->ptMaxTrackSize.x = globalWindowWidth;
-	minMaxInfo->ptMaxTrackSize.y = globalWindowHeight;
-}
-
-// PSC - Send to win32 main?
-// Should also make smaller functions in each case statement - inline?
-LRESULT CALLBACK MidiPianoMainWindowCallback(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	// Create a dispatchMessage function - maybe there's a design pattern for this?
-	// return dispatchMessage(windowHandle, message... etc
-	switch (message) {
-	case WM_CREATE:
-	{
-		// Logger
-		OutputDebugString(L"WM_CREATE\n");
-
-		win32CallbackCreate(windowHandle);
-
-		break;
-	}
-	case WM_PAINT:
-	{
-		// Logger
-		OutputDebugString(L"WM_PAINT\n");
-
-		win32CallbackPaint(windowHandle);
-
-		break;
-	}
-	case WM_KEYDOWN:
-	{
-		// Logger
-		OutputDebugString(L"WM_KEYDOWN\n");
-
-		win32CallbackKeydown(windowHandle, wParam);
-
-		break;
-	}
-	case WM_KEYUP:
-	{
-		// Logger
-		OutputDebugString(L"WM_KEYUP\n");
-
-		win32CallbackKeyup(windowHandle, wParam);
-
-		break;
-	}
-	case WM_CLOSE:
-	{
-		// Logger
-		OutputDebugString(L"WM_CLOSE\n");
-
-		win32CallbackClose();
-
-		break;
-	}
-	case WM_SIZE:
-	{
-		// Logger
-		OutputDebugString(L"WM_SIZE\n");
-
-		win32CallbackSize(lParam);
-
-		break;
-	}
-	case WM_GETMINMAXINFO:
-	{
-		// Logger
-		OutputDebugString(L"WM_GETMINMAXINFO");
-
-		win32CallbackGetMinMaxInfo(lParam);
-		
-		break;
-	}
-	}
-
-	return DefWindowProc(windowHandle, message, wParam, lParam);
-}
-
 std::string getDriverVersion(MMVERSION version)
 {
 	// Create inline function to get high and low words?
@@ -848,73 +680,28 @@ void loadMidi(HWND windowHandle)
 	openMidiDevice(windowHandle, win32MidiDeviceId);
 }
 
-const HBRUSH getWindowBackground()
-{
-	// We use the COLOR_BACKGROUND because it is the default color for a window
-	return (HBRUSH)COLOR_BACKGROUND;
-}
-
-const LPCWSTR getWindowClassName()
-{
-	return L"MidiPianoWindowClass";
-}
-
-const UINT getWindowClassStyles()
-{
-	// CS_OWNDC is used because the same DC needs to exist while the OpenGL context exists
-	return CS_OWNDC;
-}
-
-WNDCLASS buildWindowClass(HINSTANCE appInstance)
-{
-	WNDCLASS windowClass = {};
-	windowClass.lpfnWndProc = MidiPianoMainWindowCallback;
-	windowClass.hInstance = appInstance;
-	windowClass.hbrBackground = getWindowBackground();
-	windowClass.lpszClassName = getWindowClassName();
-	windowClass.style = getWindowClassStyles();
-	return windowClass;
-};
-
 // PSC - Win main
 // Move more of this logic into smaller functions
 // Could also have winMain just delegate to the app main
 // wWinMain() -> MIDIPiano::main()
 int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, _In_ int)
 {
+	Win32Window window(appInstance, L"MIDI Piano", globalWindowWidth, globalWindowHeight);
+	window.callbackCreate = win32CallbackCreate;
+	window.callbackPaint = win32CallbackPaint;
+	window.callbackKeydown = win32CallbackKeydown;
+	window.callbackKeyup = win32CallbackKeyup;
+	window.callbackSize = win32CallbackSize;
+	window.callbackClose = win32CallbackClose;
+
 	MIDI_PIANO.appInstance = appInstance;
-
-	WNDCLASS windowClass = buildWindowClass(appInstance);
-	
-	// PSC - All OutputDebugString calls should be wrapped in a logger class outside of platform code
-	OutputDebugString(L"Acquiring window handle...\n");
-
-	// PSC - Window creation logic should be wrapped in a generic platform OO layer
-	// Something like midiWindow.create() or windowFactory.platform(WIN_32).title('...') ???
-	HWND windowHandle;
-	try
-	{
-		windowHandle = createWindow(windowClass);
-	}
-	catch (CreateWindowException& e)
-	{
-		// Logger
-		OutputDebugString(L"Failed to acquire a window handle: ");
-		OutputDebugStringA(e.what());
-		OutputDebugString(L"\n");
-		exit(1);
-	}
-	
-	// Logger
-	OutputDebugString(L"Window handle acquired\n");
 
 	// Rename to initMidi?
 	// Could also have in private function inside the win32Window class?
 	// Win32Window(private)::initMidi();
-
 	try
 	{
-		loadMidi(windowHandle);
+		loadMidi(window.windowHandle);
 	}
 	catch (NoMidiDevicesFoundException& e)
 	{
@@ -926,16 +713,14 @@ int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, 
 		// Make a dialog box class?
 		// win32Dialog.show(L"Could not find...")
 		// also make them constant vars?
-		MessageBox(windowHandle, L"Could not find valid MIDI Output Device.\nThis program will now exit.", L"FATAL ERROR", MB_OK | MB_ICONERROR);
+		MessageBox(window.windowHandle, L"Could not find valid MIDI Output Device.\nThis program will now exit.", L"FATAL ERROR", MB_OK | MB_ICONERROR);
 		exit(1);
 	}
 
 	// Logger
 	OutputDebugString(L"Midi handle acquired\n");
 
-	// Show window should be handled by app logic intead?
-	// win32Window.show();
-	ShowWindow(windowHandle, SW_SHOW);
+	window.show();
 
 	// Logger
 	OutputDebugString(L"Window displayed\n");
