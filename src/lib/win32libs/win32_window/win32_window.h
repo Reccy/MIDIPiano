@@ -1,6 +1,10 @@
 #ifndef WIN32_WINDOW_H
 #define WIN32_WINDOW_h
 
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include <windows.h>
 #include <functional>
 

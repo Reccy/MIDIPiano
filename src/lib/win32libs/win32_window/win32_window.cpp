@@ -125,9 +125,8 @@ LRESULT Win32Window::windowThreadProcProxy(HWND windowHandle, UINT message, WPAR
 	if (message == WM_NCCREATE)
 	{
 		// Logger
-		OutputDebugString("WN_NCCREATE\n");
+		OutputDebugString(L"WN_NCCREATE\n");
 		SetWindowLongPtr(windowHandle, GWLP_USERDATA, (LONG_PTR)((CREATESTRUCT*) lParam)->lpCreateParams);
-		return TRUE;
 	}
 
 	Win32Window* delegate = ((Win32Window*)GetWindowLongPtr(windowHandle, GWLP_USERDATA));
@@ -146,7 +145,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_CREATE:
 	{
 		// Logger
-		OutputDebugString("WM_CREATE\n");
+		OutputDebugString(L"WM_CREATE\n");
 
 		if (callbackCreate) callbackCreate(windowHandle);
 		
@@ -155,7 +154,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_PAINT:
 	{
 		// Logger
-		OutputDebugString("WM_PAINT\n");
+		OutputDebugString(L"WM_PAINT\n");
 
 		if (callbackPaint) callbackPaint(windowHandle);
 
@@ -164,7 +163,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_KEYDOWN:
 	{
 		// Logger
-		OutputDebugString("WM_KEYDOWN\n");
+		OutputDebugString(L"WM_KEYDOWN\n");
 
 		if (callbackKeydown) callbackKeydown(windowHandle, wParam);
 
@@ -173,7 +172,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_KEYUP:
 	{
 		// Logger
-		OutputDebugString("WM_KEYUP\n");
+		OutputDebugString(L"WM_KEYUP\n");
 
 		if (callbackKeyup) callbackKeyup(windowHandle, wParam);
 
@@ -182,7 +181,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_SIZE:
 	{
 		// Logger
-		OutputDebugString("WM_SIZE\n");
+		OutputDebugString(L"WM_SIZE\n");
 
 		if (callbackSize) callbackSize(lParam);
 
@@ -191,7 +190,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 	case WM_CLOSE:
 	{
 		// Logger
-		OutputDebugString("WM_CLOSE\n");
+		OutputDebugString(L"WM_CLOSE\n");
 
 		if (callbackClose) callbackClose();
 
