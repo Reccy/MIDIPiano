@@ -1,5 +1,5 @@
-#ifndef WIN32_WINDOW_CREATE_EXCEPTION_H
-#define WIN32_WINDOW_CREATE_EXCEPTION_H
+#ifndef WIN32_CREATE_WINDOW_EXCEPTION_H
+#define WIN32_CREATE_WINDOW_EXCEPTION_H
 
 struct Win32CreateWindowException : public std::exception
 {
@@ -9,4 +9,4 @@ struct Win32CreateWindowException : public std::exception
 	}
 };
 
-#endif /* WIN32_WINDOW_CREATE_EXCEPTION_H */
+#endif /* WIN32_CREATE_WINDOW_EXCEPTION_H */

@@ -1,8 +1,13 @@
 #ifndef WIN32_DRIVER_INFO_H
 #define WIN32_DRIVER_INFO_H
 
+#ifndef UNICODE
+#define UNICODE
+#endif
+
 #include <Windows.h>
 #include <mmreg.h>
+#include <string>
 
 struct ProductIdentity
 {
@@ -28,5 +33,7 @@ struct Technology
 };
 
 const char* getTechnology(WORD technology);
+
+std::string getDriverVersion(MMVERSION version);
 
 #endif /* WIN32_DRIVER_INFO_H */

@@ -178,3 +178,15 @@ const char* getTechnology(WORD technology)
 
 	return UNKNOWN_TECHNOLOGY;
 }
+
+std::string getDriverVersion(MMVERSION version)
+{
+	// Create inline function to get high and low words?
+	int minor = HIWORD(version);
+	int major = LOWORD(version);
+
+	std::stringstream ss;
+	ss << "v" << major << "." << minor;
+
+	return ss.str();
+}

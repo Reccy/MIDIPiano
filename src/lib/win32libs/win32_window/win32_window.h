@@ -12,6 +12,7 @@ class Win32Window
 {
 public:
 	Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, int height);
+	HWND getWindowHandle();
 	void show();
 
 	std::function<void(HWND windowHandle)> callbackCreate = {};
@@ -21,12 +22,13 @@ public:
 	std::function<void()> callbackClose = {};
 	std::function<void(LPARAM lParam)> callbackSize = {};
 	std::function<void(LPARAM lParam)> callbackGetMinMaxInfo = {};
-
-	HWND windowHandle = {}; // This is a temporary public windowHandle until usage of it is removed from main
 private:
+	Win32Window();
+
 	HINSTANCE appInstance = {};
 	WNDCLASSW windowClass = {};
 	LPCWSTR windowName = {};
+	HWND windowHandle = {};
 
 	int width = {};
 	int height = {};

@@ -56,6 +56,9 @@ list(APPEND WIN32_THIRD_PARTY_LIBS "win32_driver_info")
 add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_window")
 list(APPEND WIN32_THIRD_PARTY_LIBS "win32_window")
 
+add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_midi")
+list(APPEND WIN32_THIRD_PARTY_LIBS "win32_midi")
+
 #
 # Test Suite Setup
 #

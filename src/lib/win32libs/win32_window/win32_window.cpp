@@ -11,6 +11,11 @@ Win32Window::Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, i
 	initialize();
 }
 
+HWND Win32Window::getWindowHandle()
+{
+	return windowHandle;
+}
+
 void Win32Window::show()
 {
 	ShowWindow(windowHandle, SW_SHOW);
