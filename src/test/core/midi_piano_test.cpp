@@ -3,7 +3,7 @@
 
 class MidiPianoTest : public ::testing::Test {
 protected:
-	MidiPiano piano;
+	MidiPiano::Core::MidiPiano piano;
 };
 
 TEST_F(MidiPianoTest, TestFuncReturns300) {
