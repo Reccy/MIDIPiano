@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADDITIONAL_CFLAGS} -g")
+endif()
+
 #
 # Compile Flags Setup
 #
@@ -28,7 +32,7 @@ set(LIBRARY_SOURCES
 	"${CORE_LIBRARY_DIR}/midi_piano.cpp"
 )
 
-add_library("${CORE_LIBRARY_NAME}" STATIC "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
+add_library("${CORE_LIBRARY_NAME}" "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
 target_compile_options("${CORE_LIBRARY_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 #
@@ -59,6 +63,9 @@ list(APPEND WIN32_THIRD_PARTY_LIBS "win32_window")
 add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_midi")
 list(APPEND WIN32_THIRD_PARTY_LIBS "win32_midi")
 
+add_subdirectory("${WIN32_THIRD_PARTY_LIBS_DIR}/win32_opengl")
+list(APPEND WIN32_THIRD_PARTY_LIBS "win32_opengl")
+
 #
 # Test Suite Setup
 #
@@ -70,7 +77,7 @@ set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
-target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" gtest_main "${CORE_LIBRARY_NAME}")
+target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE gtest_main "${CORE_LIBRARY_NAME}")
 target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 enable_testing()
@@ -85,12 +92,14 @@ set(EXECUTABLE_NAME "${PROJECT_NAME}")
 list(APPEND INCLUDED_LIBS "${CORE_LIBRARY_NAME}")
 list(APPEND INCLUDED_LIBS "${COMMON_THIRD_PARTY_LIBS}")
 
-if (WIN32)
+if(WIN32)
 	add_executable("${EXECUTABLE_NAME}" WIN32 "${EXECUTABLE_DIR}/win32_main.cpp")
 
 	list(APPEND INCLUDED_LIBS "${WIN32_THIRD_PARTY_LIBS}")
-endif(WIN32)
+else()
+	message(FATAL_ERROR "WIN32 is currently the only supported build platform")
+endif()
 
 target_include_directories("${EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
-target_link_libraries("${EXECUTABLE_NAME}" "${INCLUDED_LIBS}")
+target_link_libraries("${EXECUTABLE_NAME}" PRIVATE "${INCLUDED_LIBS}")
 target_compile_options("${EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")

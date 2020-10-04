@@ -2,11 +2,12 @@
 #include <win32_create_window_exception.h>
 
 // PUBLIC
-Win32Window::Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, int height) :
+Win32Window::Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, int height, std::function<void(HWND callbackCreate)> callbackCreate) :
 	appInstance(appInstance),
 	windowName(windowName),
 	width(width),
-	height(height)
+	height(height),
+	callbackCreate(callbackCreate)
 {
 	initialize();
 }
@@ -122,6 +123,11 @@ const int Win32Window::getInitialWindowPosY()
 	return screenHeight / 2 - height;
 }
 
+void Win32Window::handleMessageClose()
+{
+	PostQuitMessage(0);
+}
+
 // Stores the pointer to the Win32Window instance inside the Window context when WM_NCCREATE is received.
 // When other messages are received, retrieves the pointer, dereferences and casts it to Win32Window.
 // It then calls the normal window proc on the instance.
@@ -197,7 +203,7 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 		// Logger
 		OutputDebugString(L"WM_CLOSE\n");
 
-		if (callbackClose) callbackClose();
+		handleMessageClose();
 
 		break;
 	}

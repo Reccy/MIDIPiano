@@ -5,20 +5,62 @@
 #include <sstream>
 #include <win32_driver_info.h>
 
+// PUBLIC
+
 Win32Midi::Win32Midi(HWND windowHandle) : windowHandle(windowHandle)
 {
 	initialize();
 }
 
+HMIDIOUT Win32Midi::getHandle()
+{
+	return midiHandle;
+}
+
+// PSC - Should make this win32 play MIDI?
+void Win32Midi::playNote(Note* note)
+{
+	// Keep this :D
+	union {
+		DWORD word;
+		BYTE bytes[4];
+	} midiMessage;
+
+	midiMessage.bytes[0] = MIDI_STATUS_NOTE_ON;
+	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[2] = 127;
+	midiMessage.bytes[3] = 0;
+
+	// Consider using a MIDI Stream instead?
+	// Slight latency with current method
+	// https://docs.microsoft.com/en-us/windows/win32/multimedia/managing-midi-data-blocks
+	// Might need to use a double buffer and use it this way to prevent the audio latency
+	sendMidiMessage(midiMessage.word);
+}
+
+// PSC - Should make this win32 stop MIDI?
+void Win32Midi::stopNote(Note* note)
+{
+	// Keep this :D
+	union {
+		DWORD word;
+		BYTE bytes[4];
+	} midiMessage;
+
+	midiMessage.bytes[0] = MIDI_STATUS_NOTE_OFF;
+	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[2] = 127;
+	midiMessage.bytes[3] = 0;
+
+	sendMidiMessage(midiMessage.word);
+}
+
+// PRIVATE
+
 void Win32Midi::initialize()
 {
 	int win32MidiDeviceId = findWin32MidiDevice();
 	openMidiDevice(windowHandle, win32MidiDeviceId);
-}
-
-HMIDIOUT Win32Midi::getHandle()
-{
-	return midiHandle;
 }
 
 int Win32Midi::findWin32MidiDevice()
@@ -99,43 +141,6 @@ void Win32Midi::logMidiDevice(MIDIOUTCAPS midi, unsigned int midiDeviceIndex, in
 	OutputDebugString(ss.str().c_str());
 }
 
-// PSC - Should make this win32 play MIDI?
-void Win32Midi::playNote(Note* note)
-{
-	// Keep this :D
-	union {
-		DWORD word;
-		BYTE bytes[4];
-	} midiMessage;
-
-	midiMessage.bytes[0] = MIDI_STATUS_NOTE_ON;
-	midiMessage.bytes[1] = note->id;
-	midiMessage.bytes[2] = 127;
-	midiMessage.bytes[3] = 0;
-
-	// Consider using a MIDI Stream instead?
-	// Slight latency with current method
-	// https://docs.microsoft.com/en-us/windows/win32/multimedia/managing-midi-data-blocks
-	// Might need to use a double buffer and use it this way to prevent the audio latency
-	sendMidiMessage(midiMessage.word);
-}
-
-// PSC - Should make this win32 stop MIDI?
-void Win32Midi::stopNote(Note* note)
-{
-	// Keep this :D
-	union {
-		DWORD word;
-		BYTE bytes[4];
-	} midiMessage;
-
-	midiMessage.bytes[0] = MIDI_STATUS_NOTE_OFF;
-	midiMessage.bytes[1] = note->id;
-	midiMessage.bytes[2] = 127;
-	midiMessage.bytes[3] = 0;
-
-	sendMidiMessage(midiMessage.word);
-}
 
 
 // PSC - May need to be refactored too

@@ -11,7 +11,7 @@
 class Win32Window
 {
 public:
-	Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, int height);
+	Win32Window(HINSTANCE appInstance, LPCWSTR windowName, int width, int height, std::function<void(HWND windowHandle)> callbackCreate);
 	HWND getWindowHandle();
 	void show();
 
@@ -19,7 +19,6 @@ public:
 	std::function<void(HWND windowHandle)> callbackPaint = {};
 	std::function<void(HWND windowHandle, WPARAM wParam)> callbackKeydown = {};
 	std::function<void(HWND windowHandle, WPARAM wParam)> callbackKeyup = {};
-	std::function<void()> callbackClose = {};
 	std::function<void(LPARAM lParam)> callbackSize = {};
 	std::function<void(LPARAM lParam)> callbackGetMinMaxInfo = {};
 private:
@@ -45,6 +44,8 @@ private:
 	const int getInitialWindowPosX();
 	const int getInitialWindowPosY();
 	const DWORD getWindowStyle();
+
+	void handleMessageClose();
 
 	static LRESULT windowThreadProcProxy(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam);
 	LRESULT CALLBACK windowThreadProc(HWND windowHandle, UINT message, WPARAM wParam, LPARAM lParam);
