@@ -6,7 +6,6 @@
 #endif
 
 #include <Windows.h>
-#include <win32_note.h>
 
 class Win32Midi
 {
@@ -14,8 +13,8 @@ public:
 	Win32Midi(HWND windowHandle);
 	HMIDIOUT getHandle();
 
-	void playNote(Note*);
-	void stopNote(Note*);
+	void playNote(int midiNote);
+	void stopNote(int midiNote);
 private:
 	Win32Midi();
 

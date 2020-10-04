@@ -2,6 +2,8 @@
 #include "midi_piano.h"
 
 class MidiPianoTest : public ::testing::Test {
+	MidiPianoTest()
+	{}
 protected:
 	MidiPiano::Core::MidiPiano piano;
 };

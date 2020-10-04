@@ -26,10 +26,15 @@ set(CORE_LIBRARY_NAME "${PROJECT_NAME}Core")
 
 set(LIBRARY_HEADERS
 	"${CORE_LIBRARY_DIR}/midi_piano.h"
+	"${CORE_LIBRARY_DIR}/keymapper.h"
+	"${CORE_LIBRARY_DIR}/i_midi_out.h"
+	"${CORE_LIBRARY_DIR}/i_user_io.h"
+	"${CORE_LIBRARY_DIR}/i_logger.h"
 )
 
 set(LIBRARY_SOURCES
 	"${CORE_LIBRARY_DIR}/midi_piano.cpp"
+	"${CORE_LIBRARY_DIR}/keymapper.cpp"
 )
 
 add_library("${CORE_LIBRARY_NAME}" "${LIBRARY_SOURCES}" "${LIBRARY_HEADERS}")
@@ -75,6 +80,7 @@ set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
 	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp")
+list(APPEND TEST_INCLUDED_DIRS "${CORE_LIBRARY_NAME}")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
 target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE gtest_main "${CORE_LIBRARY_NAME}")

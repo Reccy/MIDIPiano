@@ -18,7 +18,7 @@ HMIDIOUT Win32Midi::getHandle()
 }
 
 // PSC - Should make this win32 play MIDI?
-void Win32Midi::playNote(Note* note)
+void Win32Midi::playNote(int midiNote)
 {
 	// Keep this :D
 	union {
@@ -27,7 +27,7 @@ void Win32Midi::playNote(Note* note)
 	} midiMessage;
 
 	midiMessage.bytes[0] = MIDI_STATUS_NOTE_ON;
-	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[1] = midiNote;
 	midiMessage.bytes[2] = 127;
 	midiMessage.bytes[3] = 0;
 
@@ -39,7 +39,7 @@ void Win32Midi::playNote(Note* note)
 }
 
 // PSC - Should make this win32 stop MIDI?
-void Win32Midi::stopNote(Note* note)
+void Win32Midi::stopNote(int midiNote)
 {
 	// Keep this :D
 	union {
@@ -48,7 +48,7 @@ void Win32Midi::stopNote(Note* note)
 	} midiMessage;
 
 	midiMessage.bytes[0] = MIDI_STATUS_NOTE_OFF;
-	midiMessage.bytes[1] = note->id;
+	midiMessage.bytes[1] = midiNote;
 	midiMessage.bytes[2] = 127;
 	midiMessage.bytes[3] = 0;
 
@@ -140,8 +140,6 @@ void Win32Midi::logMidiDevice(MIDIOUTCAPS midi, unsigned int midiDeviceIndex, in
 	// Logger
 	OutputDebugString(ss.str().c_str());
 }
-
-
 
 // PSC - May need to be refactored too
 void Win32Midi::sendMidiMessage(DWORD message)
