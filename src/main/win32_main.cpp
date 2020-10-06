@@ -22,21 +22,23 @@ class Win32UserIO : public MidiPiano::Core::IUserIO
 public:
 	void emitKeydown(LPCSTR character)
 	{
-		char charParam = convertLPCSTR(character);
-		onKeydown(charParam);
+		logChar(*character);
+		onKeydown(*character);
 	}
 
 	void emitKeyup(LPCSTR character)
 	{
-		char charParam = convertLPCSTR(character);
-		onKeyup(charParam);
+		logChar(*character);
+		onKeyup(*character);
 	}
 private:
-	char convertLPCSTR(LPCSTR character)
+	void logChar(char character)
 	{
-		UINT r = MapVirtualKey(*character, MAPVK_VK_TO_CHAR);
-		OutputDebugStringA("" + r);
-		return (*character);
+		char str[3];
+		str[0] = character;
+		str[1] = '\n';
+		str[2] = '\0';
+		OutputDebugStringA(str);
 	}
 };
 
@@ -52,6 +54,12 @@ static struct MIDI_PIANO {
 // Also move these down to where they're used, should not be global
 static int GLOBAL_WINDOW_WIDTH = 300;
 static int GLOBAL_WINDOW_HEIGHT = 100;
+
+char mapVkToChar(WPARAM wParam)
+{
+	UINT mappedChar = MapVirtualKeyW(static_cast<UINT>(wParam), MAPVK_VK_TO_CHAR);
+	return static_cast<char>(mappedChar);
+}
 
 static void win32PollMessages()
 {
@@ -89,9 +97,9 @@ void win32CallbackPaint(HWND windowHandle)
 
 void win32CallbackKeydown(HWND windowHandle, WPARAM wParam)
 {
-	LPCSTR character = (LPCSTR)&wParam;
+	char character = mapVkToChar(wParam);
 
-	MIDI_PIANO.io->emitKeydown(character);
+	MIDI_PIANO.io->emitKeydown(&character);
 
 	// Win32Window.redraw - private method
 	RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
@@ -99,9 +107,9 @@ void win32CallbackKeydown(HWND windowHandle, WPARAM wParam)
 
 void win32CallbackKeyup(HWND windowHandle, WPARAM wParam)
 {
-	LPCSTR character = (LPCSTR)&wParam;
+	char character = mapVkToChar(wParam);
 
-	MIDI_PIANO.io->emitKeyup(character);
+	MIDI_PIANO.io->emitKeyup(&character);
 
 	// Win32Window.redraw - private method
 	RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);

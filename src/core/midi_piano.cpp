@@ -4,6 +4,8 @@
 #include <functional>
 
 namespace MidiPiano::Core {
+	MidiPiano::MidiPiano() {} // TEMP: Delete this when writing new tests
+
 	MidiPiano::MidiPiano(IMidiOut* midiOut, IUserIO* userIO, ILogger* logger) : 
 		midiOut(midiOut),
 		userIO(userIO),

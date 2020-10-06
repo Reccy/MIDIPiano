@@ -13,6 +13,7 @@ namespace MidiPiano::Core
 {
 	class MidiPiano {
 	public:
+		MidiPiano();// TEMP: Delete this when writing new tests
 		MidiPiano(IMidiOut* midiOut, IUserIO* userIO, ILogger* logger);
 		int test_func();
 	private:
