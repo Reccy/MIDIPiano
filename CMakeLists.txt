@@ -79,7 +79,8 @@ set(TEST_SUITE_DIR "src/test")
 set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
 	"${TEST_SUITE_DIR}/test_runner.cpp"
-	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp")
+	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp"
+	"${TEST_SUITE_DIR}/core/keymapper_test.cpp")
 list(APPEND TEST_INCLUDED_DIRS "${CORE_LIBRARY_NAME}")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
