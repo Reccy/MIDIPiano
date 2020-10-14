@@ -17,7 +17,7 @@ protected:
 	MidiPiano::Core::Keymapper keymapper;
 };
 
-TEST_P(KeymapperTest, ConvertsCharactersToMidiNotes) {
+TEST_P(KeymapperTest, map) {
 	int actual_result = keymapper.map(GetParam().input);
 	int expected_result = GetParam().result;
 
