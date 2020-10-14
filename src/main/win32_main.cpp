@@ -137,7 +137,9 @@ public:
 	{
 		std::wstringstream ss;
 		ss << message;
-		log(ss.str());
+		
+		std::wstring converted_message = ss.str();
+		log(converted_message);
 	}
 
 	void log(std::string message)
@@ -149,7 +151,9 @@ public:
 	{
 		std::stringstream ss;
 		ss << message;
-		log(ss.str());
+
+		std::string converted_message = ss.str();
+		log(converted_message);
 	}
 };
 
