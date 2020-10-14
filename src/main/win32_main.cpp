@@ -16,38 +16,12 @@
 #include <string>
 #include <sstream>
 
-// Move this to its own class  :/
-class Win32UserIO : public MidiPiano::Core::IUserIO
-{
-public:
-	void emitKeydown(LPCSTR character)
-	{
-		logChar(*character);
-		onKeydown(*character);
-	}
-
-	void emitKeyup(LPCSTR character)
-	{
-		logChar(*character);
-		onKeyup(*character);
-	}
-private:
-	void logChar(char character)
-	{
-		char str[3];
-		str[0] = character;
-		str[1] = '\n';
-		str[2] = '\0';
-		OutputDebugStringA(str);
-	}
-};
-
 // PSC - Refactor this to try and remove any global references
 // Change it to Win32MidiPiano class or IMidiPianoUI?
 static struct MIDI_PIANO {
 	Win32Midi* midi;
 	Win32OpenGl* openGl;
-	Win32UserIO* io;
+	MidiPiano::Core::MidiPiano* piano;
 } MIDI_PIANO;
 
 // ASC - Add a way to create a window generically
@@ -95,11 +69,18 @@ void win32CallbackPaint(HWND windowHandle)
 	EndPaint(windowHandle, &paint);
 }
 
+void win32CallbackKillFocus(WPARAM)
+{
+	if (!MIDI_PIANO.piano) return;
+
+	MIDI_PIANO.piano->silenceAllNotes();
+}
+
 void win32CallbackKeydown(HWND windowHandle, WPARAM wParam)
 {
 	char character = mapVkToChar(wParam);
 
-	MIDI_PIANO.io->emitKeydown(&character);
+	MIDI_PIANO.piano->onKeydown(character);
 
 	// Win32Window.redraw - private method
 	RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
@@ -109,7 +90,7 @@ void win32CallbackKeyup(HWND windowHandle, WPARAM wParam)
 {
 	char character = mapVkToChar(wParam);
 
-	MIDI_PIANO.io->emitKeyup(&character);
+	MIDI_PIANO.piano->onKeyup(character);
 
 	// Win32Window.redraw - private method
 	RedrawWindow(windowHandle, NULL, NULL, RDW_ERASE | RDW_INVALIDATE);
@@ -132,15 +113,11 @@ public:
 
 	void playNote(int midiNote)
 	{
-		if (midiNote < 0) return;
-
 		win32Midi->playNote(midiNote);
 	}
 
 	void stopNote(int midiNote)
 	{
-		if (midiNote < 0) return;
-
 		win32Midi->stopNote(midiNote);
 	}
 private:
@@ -181,19 +158,18 @@ int WINAPI wWinMain(_In_ HINSTANCE appInstance, _In_opt_ HINSTANCE, _In_ PWSTR, 
 {
 	Win32Window window(appInstance, L"MIDI Piano", GLOBAL_WINDOW_WIDTH, GLOBAL_WINDOW_HEIGHT, win32CallbackCreate);
 	window.callbackPaint = win32CallbackPaint;
+	window.callbackKillFocus = win32CallbackKillFocus;
 	window.callbackSize = win32CallbackSize;
 
 	MidiPiano::Core::IMidiOut* midiOutAdapter = new Win32MidiOutAdapter(MIDI_PIANO.midi);
-	MidiPiano::Core::IUserIO* userIO = new Win32UserIO();
 	MidiPiano::Core::ILogger* logger = new Win32Logger();
-
-	// Find a better way to do this, don't just set a global :(
-	MIDI_PIANO.io = (Win32UserIO*)userIO;
 
 	window.callbackKeydown = win32CallbackKeydown;
 	window.callbackKeyup = win32CallbackKeyup;
 
-	MidiPiano::Core::MidiPiano piano(midiOutAdapter, userIO, logger);
+	MidiPiano::Core::MidiPiano piano(midiOutAdapter, logger);
+
+	MIDI_PIANO.piano = &piano;
 
 	window.show();
 

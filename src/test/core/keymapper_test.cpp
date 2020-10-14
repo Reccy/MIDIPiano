@@ -1,77 +1,62 @@
-#include <gtest/gtest.h>
+#include<gtest/gtest.h>
 #include "keymapper.h"
 
-class KeymapperTest : public ::testing::Test {
+const struct KeymapTestData
+{
+	char input;
+	int result;
+};
+
+std::ostream& operator<<(std::ostream& os, const KeymapTestData& keymapTestData)
+{
+	return os << "input: " << keymapTestData.input << " result: " << keymapTestData.result;
+};
+
+class KeymapperTest : public ::testing::TestWithParam<KeymapTestData> {
 protected:
 	MidiPiano::Core::Keymapper keymapper;
 };
 
-TEST_F(KeymapperTest, HandlesCharacterZ) {
-	int result = keymapper.map('Z');
-	EXPECT_EQ(result, 36);
+TEST_P(KeymapperTest, ConvertsCharactersToMidiNotes) {
+	int actual_result = keymapper.map(GetParam().input);
+	int expected_result = GetParam().result;
+
+	EXPECT_EQ(expected_result, actual_result);
 }
 
-TEST_F(KeymapperTest, HandlesCharacterS) {
-	int result = keymapper.map('S');
-	EXPECT_EQ(result, 37);
-}
+KeymapTestData validParams[] = {
+	{ 'Z', 36 },
+	{ 'S', 37 },
+	{ 'X', 38 },
+	{ 'D', 39 },
+	{ 'C', 40 },
+	{ 'V', 41 },
+	{ 'G', 42 },
+	{ 'B', 43 },
+	{ 'H', 44 },
+	{ 'N', 45 },
+	{ 'J', 46 },
+	{ 'M', 47 },
+	{ ',', 48 }
+};
 
-TEST_F(KeymapperTest, HandlesCharacterX) {
-	int result = keymapper.map('X');
-	EXPECT_EQ(result, 38);
-}
+INSTANTIATE_TEST_SUITE_P(KeymapperValidInputs, KeymapperTest, ::testing::ValuesIn(validParams));
 
-TEST_F(KeymapperTest, HandlesCharacterD) {
-	int result = keymapper.map('D');
-	EXPECT_EQ(result, 39);
-}
+KeymapTestData invalidParams[] = {
+	{ '!', -1 },
+	{ 'Q', -1 },
+	{ 'W', -1 },
+	{ 'E', -1 },
+	{ 'R', -1 },
+	{ 'T', -1 },
+	{ 'Y', -1 },
+	{ 'z', -1 },
+	{ 'x', -1 },
+	{ 'c', -1 },
+	{ 'v', -1 },
+	{ 'b', -1 },
+	{ 'n', -1 },
+	{ 'm', -1 }
+};
 
-TEST_F(KeymapperTest, HandlesCharacterC) {
-	int result = keymapper.map('C');
-	EXPECT_EQ(result, 40);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterV) {
-	int result = keymapper.map('V');
-	EXPECT_EQ(result, 41);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterG) {
-	int result = keymapper.map('G');
-	EXPECT_EQ(result, 42);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterB) {
-	int result = keymapper.map('B');
-	EXPECT_EQ(result, 43);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterH) {
-	int result = keymapper.map('H');
-	EXPECT_EQ(result, 44);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterN) {
-	int result = keymapper.map('N');
-	EXPECT_EQ(result, 45);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterJ) {
-	int result = keymapper.map('J');
-	EXPECT_EQ(result, 46);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterM) {
-	int result = keymapper.map('M');
-	EXPECT_EQ(result, 47);
-}
-
-TEST_F(KeymapperTest, HandlesCharacterComma) {
-	int result = keymapper.map(',');
-	EXPECT_EQ(result, 48);
-}
-
-TEST_F(KeymapperTest, HandlesInvalidCharacter) {
-	int result = keymapper.map('!');
-	EXPECT_EQ(result, -1);
-}
+INSTANTIATE_TEST_SUITE_P(KeymapperInvalidInputs, KeymapperTest, ::testing::ValuesIn(invalidParams));

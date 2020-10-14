@@ -17,7 +17,6 @@ HMIDIOUT Win32Midi::getHandle()
 	return midiHandle;
 }
 
-// PSC - Should make this win32 play MIDI?
 void Win32Midi::playNote(int midiNote)
 {
 	// Keep this :D
@@ -38,7 +37,6 @@ void Win32Midi::playNote(int midiNote)
 	sendMidiMessage(midiMessage.word);
 }
 
-// PSC - Should make this win32 stop MIDI?
 void Win32Midi::stopNote(int midiNote)
 {
 	// Keep this :D

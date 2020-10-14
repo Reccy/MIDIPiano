@@ -189,6 +189,15 @@ LRESULT Win32Window::windowThreadProc(HWND windowHandle, UINT message, WPARAM wP
 
 		break;
 	}
+	case WM_KILLFOCUS:
+	{
+		// Logger
+		OutputDebugString(L"WM_KILLFOCUS\n");
+
+		if (callbackKillFocus) callbackKillFocus(wParam);
+
+		break;
+	}
 	case WM_SIZE:
 	{
 		// Logger

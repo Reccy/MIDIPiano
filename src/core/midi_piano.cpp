@@ -4,42 +4,58 @@
 #include <functional>
 
 namespace MidiPiano::Core {
-	MidiPiano::MidiPiano() {} // TEMP: Delete this when writing new tests
-
-	MidiPiano::MidiPiano(IMidiOut* midiOut, IUserIO* userIO, ILogger* logger) : 
+	MidiPiano::MidiPiano(IMidiOut* midiOut, ILogger* logger) : 
 		midiOut(midiOut),
-		userIO(userIO),
 		logger(logger)
-	{
-		userIO->onKeydown = [=](char character) {
-			this->onKeydown(character);
-		};
-
-		userIO->onKeyup = [=](char character) {
-			this->onKeyup(character);
-		};
-	}
+	{}
 
 	void MidiPiano::onKeydown(char character)
 	{
-		int pianoKey = keymapper.map(character);
+		int midiNote = keymapper.map(character);
 
-		if (noteSilenced(pianoKey))
+		if (midiNote < 0) return;
+
+		if (noteSilenced(midiNote))
 		{
-			soundedNotes.insert(pianoKey);
-			midiOut->playNote(pianoKey);
+			playNote(midiNote);
 		}
 	}
 
 	void MidiPiano::onKeyup(char character)
 	{
-		int pianoKey = keymapper.map(character);
+		int midiNote = keymapper.map(character);
 
-		if (notePlaying(pianoKey))
+		if (midiNote < 0) return;
+
+		if (notePlaying(midiNote))
 		{
-			soundedNotes.erase(pianoKey);
-			midiOut->stopNote(pianoKey);
+			silenceNote(midiNote);
 		}
+	}
+
+	void MidiPiano::silenceAllNotes()
+	{
+		// NOTE(aaron.meaney): We create a copy of soundedNotes as silencing a note
+		// will mutate the original set while inside an iterator.
+		// This will cause a data structure invalidation!
+		std::set soundedNotesCopy(soundedNotes);
+
+		for (const int midiNote : soundedNotesCopy)
+		{
+			silenceNote(midiNote);
+		}
+	}
+
+	void MidiPiano::playNote(int midiNote)
+	{
+		soundedNotes.insert(midiNote);
+		midiOut->playNote(midiNote);
+	}
+
+	void MidiPiano::silenceNote(int midiNote)
+	{
+		soundedNotes.erase(midiNote);
+		midiOut->stopNote(midiNote);
 	}
 
 	bool MidiPiano::notePlaying(int midiNote)
@@ -50,9 +66,5 @@ namespace MidiPiano::Core {
 	bool MidiPiano::noteSilenced(int midiNote)
 	{
 		return (soundedNotes.find(midiNote) == soundedNotes.end());
-	}
-
-	int MidiPiano::test_func() {
-		return 300;
 	}
 }

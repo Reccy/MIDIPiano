@@ -28,7 +28,7 @@ set(LIBRARY_HEADERS
 	"${CORE_LIBRARY_DIR}/midi_piano.h"
 	"${CORE_LIBRARY_DIR}/keymapper.h"
 	"${CORE_LIBRARY_DIR}/i_midi_out.h"
-	"${CORE_LIBRARY_DIR}/i_user_io.h"
+	
 	"${CORE_LIBRARY_DIR}/i_logger.h"
 )
 
@@ -74,21 +74,21 @@ list(APPEND WIN32_THIRD_PARTY_LIBS "win32_opengl")
 #
 # Test Suite Setup
 #
+include(GoogleTest)
 include("cmake/SetupGoogleTest.cmake")
 set(TEST_SUITE_DIR "src/test")
 set(TEST_RUNNER_EXECUTABLE_NAME "${PROJECT_NAME}TestRunner")
 set(TEST_RUNNER_EXECUTABLE_SOURCES
-	"${TEST_SUITE_DIR}/test_runner.cpp"
 	"${TEST_SUITE_DIR}/core/midi_piano_test.cpp"
 	"${TEST_SUITE_DIR}/core/keymapper_test.cpp")
 list(APPEND TEST_INCLUDED_DIRS "${CORE_LIBRARY_NAME}")
 add_executable("${TEST_RUNNER_EXECUTABLE_NAME}" "${TEST_RUNNER_EXECUTABLE_SOURCES}")
 target_include_directories("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CORE_LIBRARY_DIR}")
-target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE gtest_main "${CORE_LIBRARY_NAME}")
+target_link_libraries("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE gtest_main gmock_main "${CORE_LIBRARY_NAME}")
 target_compile_options("${TEST_RUNNER_EXECUTABLE_NAME}" PRIVATE "${CUSTOM_COMPILE_FLAGS}")
 
 enable_testing()
-add_test(NAME "${TEST_RUNNER_EXECUTABLE_NAME}" COMMAND "${TEST_RUNNER_EXECUTABLE_NAME}")
+gtest_discover_tests("${TEST_RUNNER_EXECUTABLE_NAME}")
 
 #
 # Executable Setup

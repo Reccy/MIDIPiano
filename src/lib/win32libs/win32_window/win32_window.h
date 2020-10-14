@@ -19,6 +19,7 @@ public:
 	std::function<void(HWND windowHandle)> callbackPaint = {};
 	std::function<void(HWND windowHandle, WPARAM wParam)> callbackKeydown = {};
 	std::function<void(HWND windowHandle, WPARAM wParam)> callbackKeyup = {};
+	std::function<void(WPARAM wParam)> callbackKillFocus = {};
 	std::function<void(LPARAM lParam)> callbackSize = {};
 	std::function<void(LPARAM lParam)> callbackGetMinMaxInfo = {};
 private:

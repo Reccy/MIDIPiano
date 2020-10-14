@@ -3,7 +3,6 @@
 #endif // _MIDI_PIANO_H
 
 #include "i_midi_out.h"
-#include "i_user_io.h"
 #include "i_logger.h"
 #include "keymapper.h"
 
@@ -13,21 +12,22 @@ namespace MidiPiano::Core
 {
 	class MidiPiano {
 	public:
-		MidiPiano();// TEMP: Delete this when writing new tests
-		MidiPiano(IMidiOut* midiOut, IUserIO* userIO, ILogger* logger);
-		int test_func();
+		MidiPiano(IMidiOut* midiOut, ILogger* logger);
+
+		void onKeydown(char character);
+		void onKeyup(char character);
+
+		void silenceAllNotes();
 	private:
 		IMidiOut* midiOut;
-		IUserIO* userIO;
 		ILogger* logger;
 
 		Keymapper keymapper;
 
 		std::set<int> soundedNotes = {};
 
-		void onKeyup(char character);
-		void onKeydown(char character);
-
+		void playNote(int midiNote);
+		void silenceNote(int midiNote);
 		bool notePlaying(int midiNote);
 		bool noteSilenced(int midiNote);
 	};
