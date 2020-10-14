@@ -60,7 +60,6 @@ void win32CallbackCreate(HWND windowHandle)
 void win32CallbackPaint(HWND windowHandle)
 {
 	// This is all temporary drawing code until I implement a proper GUI system
-	RECT rectangle = {};
 	PAINTSTRUCT paint = {};
 	HDC deviceContext = BeginPaint(windowHandle, &paint);
 
@@ -107,7 +106,7 @@ void win32CallbackSize(LPARAM lParam)
 class Win32MidiOutAdapter : virtual public MidiPiano::Core::IMidiOut
 {
 public:
-	Win32MidiOutAdapter(Win32Midi* win32Midi) :
+	explicit Win32MidiOutAdapter(Win32Midi* win32Midi) :
 		win32Midi(win32Midi)
 	{}
 
