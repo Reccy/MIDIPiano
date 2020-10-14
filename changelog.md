@@ -9,4 +9,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## \[Unreleased]
 
 ### Added
+-   Ability to use the keyboard as a virtual piano (<https://github.com/Reccy/MIDIPiano/issues/61>)
 -   Initial Changelog (<https://github.com/Reccy/MIDIPiano/issues/58>)
