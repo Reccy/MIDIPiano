@@ -67,11 +67,13 @@ When creating a release, perform the following steps:
 4. Create a release branch off of master ([See New Release](https://github.com/Reccy/MIDIPiano/tree/master#new-release))
 
 #### Updating Changelog for Release
-Change the `Unreleased` category in `changelog.md` to match the following format:  
-`## \[MAJOR.MINOR.PATCH] - YYYY-MM-DD`
+Change the `Unreleased` category in `changelog.md` to match one of the following formats:  
+- `## \[MAJOR.MINOR.PATCH] - YYYY-MM-DD`
+- `## \[MAJOR.MINOR.PATCH-PRERELEASE_TAG-PRERELEASE_VERSION] - YYYY-MM-DD`
 
 For example:  
-`## \[1.2.12] - 2020-04-02`
+- `## \[1.2.12] - 2020-04-02`
+- `## \[1.3.0-rc.1] - 2020-04-03`
 
 This allows the build pipeline to generate the changelog for the GitHub Release page.  
 If there is no section in the changelog for that release branch on the correct release date *(in UTC)*, then the pipeline will intentionally fail.
@@ -90,13 +92,23 @@ Examples of possible branch names attached to issues are:
 
 Release branch names follow the [semantic versioning](https://semver.org/) format:
 - `release/MAJOR.MINOR.PATCH`
+- `release/MAJOR.MINOR.PATCH-PRERELEASE_TAG-PRERELEASE_VERSION`
 
 For example:
 - `release/1.33.0`
 - `release/1.33.1`
 - `release/1.33.2`
 - `release/1.34.0`
+- `release/2.0.0-alpha.1`
+- `release/2.0.0-alpha.2`
+- `release/2.0.0-beta.1`
+- `release/2.0.0-rc.1`
+- `release/2.0.0-rc.2`
 - `release/2.0.0`
+
+Alpha, Beta and Release Candidate (RC) branches refer to that semantic version in the branch name.
+
+E.g. it is possible to have an alpha branch for `v1.33.0` as `release/1.33.0-alpha.1` and then later on an alpha branch for `v2.0.0` as `release/2.0.0-alpha.1`
 
 ### Branching Strategy
 This project uses a slightly modified version of the [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html) model for managing branching.
@@ -106,6 +118,8 @@ All commits will be squashed before merging into `master`.
 
 ### New Release
 Branch off of `master` with the following format `release/MAJOR.MINOR.PATCH` to trigger a release GitHub Action workflow.
+Optionally add a pre-release tag with this format `release/MAJOR.MINOR.PATCH-PRERELEASE_TAG-PRERELEASE_VERSION`.
+See [Branch Names](#branch-names) above for more information.
 
 The workflow will automatically tag the latest commit with the version in the branch name. E.g. `v1.33.2`
 
