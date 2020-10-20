@@ -27,7 +27,7 @@ jobs:
         IS_PRERELEASE=false
         if [ ! -z "$PRERELEASE_TAG" ] && [ ! -z "$PRERELEASE_VERSION" ];
         then
-            FULL_VERSION="$FULL_VERSION-$PRERELEASE_TAG.$PRERELEASE_VERSION}"
+            FULL_VERSION="$FULL_VERSION-$PRERELEASE_TAG.$PRERELEASE_VERSION"
             IS_PRERELEASE=true
         fi
         echo "::set-output name=major::$(echo $MAJOR)"
