@@ -67,11 +67,13 @@ When creating a release, perform the following steps:
 4. Create a release branch off of master ([See New Release](https://github.com/Reccy/MIDIPiano/tree/master#new-release))
 
 #### Updating Changelog for Release
-Change the `Unreleased` category in `changelog.md` to match the following format:  
+Change the `Unreleased` category in `changelog.md` to match one of the following formats:  
 `## \[MAJOR.MINOR.PATCH] - YYYY-MM-DD`
+`## \[MAJOR.MINOR.PATCH-PRERELEASE_TAG-PRERELEASE_VERSION] - YYYY-MM-DD`
 
 For example:  
 `## \[1.2.12] - 2020-04-02`
+`## \[1.3.0-rc.1] - 2020-04-03`
 
 This allows the build pipeline to generate the changelog for the GitHub Release page.  
 If there is no section in the changelog for that release branch on the correct release date *(in UTC)*, then the pipeline will intentionally fail.
