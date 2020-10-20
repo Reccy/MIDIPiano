@@ -16,14 +16,27 @@ jobs:
       shell: bash
       run: |
         BRANCH_NAME=$(echo ${{ steps.extract_branch.outputs.branch }})
-        REGEXP='^release/([0-9]+).([0-9]+).([0-9]+)$'
+        REGEXP='^release/([0-9]+).([0-9]+).([0-9]+)(-(alpha|beta|rc).([0-9]+))?$'
         [[ ! $BRANCH_NAME =~ $REGEXP ]] && exit 1
         MAJOR=${BASH_REMATCH[1]}
         MINOR=${BASH_REMATCH[2]}
         PATCH=${BASH_REMATCH[3]}
+        PRERELEASE_TAG=${BASH_REMATCH[5]}
+        PRERELEASE_VERSION=${BASH_REMATCH[6]}
+        FULL_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+        IS_PRERELEASE=false
+        if [ ! -z "$PRERELEASE_TAG" ] && [ ! -z "$PRERELEASE_VERSION" ];
+        then
+            FULL_VERSION="$FULL_VERSION-$PRERELEASE_TAG.$PRERELEASE_VERSION}"
+            IS_PRERELEASE=true
+        fi
         echo "::set-output name=major::$(echo $MAJOR)"
         echo "::set-output name=minor::$(echo $MINOR)"
         echo "::set-output name=patch::$(echo $PATCH)"
+        echo "::set-output name=prerelease_tag::$(echo $PRERELEASE_TAG)"
+        echo "::set-output name=prerelease_version::$(echo $PRERELEASE_VERSION)"
+        echo "::set-output name=full_version::$(echo $FULL_VERSION)"
+        echo "::set-output name=is_prerelease::$(echo $IS_PRERELEASE)"
     - name: Generate release date
       id: generate_release_date
       shell: bash
@@ -33,7 +46,7 @@ jobs:
     - name: Validate changelog exists
       shell: bash
       run: |
-        VERSION=${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
+        VERSION=${{ steps.branch_version.outputs.full_version }}
         RELEASE_DATE=${{ steps.generate_release_date.outputs.release_date }}
         SEARCH_STRING="## \[$VERSION] - $RELEASE_DATE"
 
@@ -52,7 +65,7 @@ jobs:
       id: generate_release_changelog
       shell: bash
       run: |
-        BEGIN_DELIMETER_REGEXP='\#\# \\\[${{ steps.branch_version.outputs.major }}\.${{ steps.branch_version.outputs.minor }}\.${{ steps.branch_version.outputs.patch }}] - ${{ steps.generate_release_date.outputs.release_date }}'
+        BEGIN_DELIMETER_REGEXP='\#\# \\\[${{ steps.branch_version.outputs.full_version }}] - ${{ steps.generate_release_date.outputs.release_date }}'
         END_DELIMETER_REGEXP='\#\# \\\[[[:digit:]]+\.[[:digit:]]+\.[[:digit:]]+] - [[:digit:]]{4}-[[:digit:]]{2}-[[:digit:]]{2}'
         FOUND_FIRST_DELIMETER=0
         FOUND_FIRST_LINE=0
@@ -102,8 +115,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
-        release_name: Release v${{ steps.branch_version.outputs.major }}.${{ steps.branch_version.outputs.minor }}.${{ steps.branch_version.outputs.patch }}
+        tag_name: v${{ steps.branch_version.outputs.full_version }}
+        release_name: Release v${{ steps.branch_version.outputs.full_version }}
         draft: false
         prerelease: false
         body: ${{ steps.generate_release_changelog.outputs.changelog }}
@@ -114,5 +127,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: upload/MidiPiano.exe
-        asset_name: midi-piano-${{ steps.branch_version.outputs.major }}-${{ steps.branch_version.outputs.minor }}-${{ steps.branch_version.outputs.patch }}.exe
+        asset_name: midi-piano-${{ steps.branch_version.outputs.full_version }}.exe
         asset_content_type: application/vnd.microsoft.portable-executable
