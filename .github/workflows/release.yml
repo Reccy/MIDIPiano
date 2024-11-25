@@ -102,7 +102,7 @@ jobs:
         echo "$CHANGELOG"
         echo "::set-output name=changelog::$(echo $CHANGELOG)"
     - name: Download workflow artifact
-      uses: dawidd6/action-download-artifact@v2.7.0
+      uses: dawidd6/action-download-artifact@v6
       with:
         workflow: build-and-test.yml
         branch: ${{ steps.extract_branch.outputs.branch }}
